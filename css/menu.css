@@ -40,31 +40,28 @@ body {
     min-height: 0;
 }
 
-/* The widget container — aspect-ratio gives definite height so child % work */
+/* The widget container — height driven by image natural dimensions */
 .sotd-widget {
     position: relative;
-    width: min(96%, 460px);
-    aspect-ratio: 1260 / 480;
+    width: min(96%, 560px);
 }
 
-/* Hand-drawn oval image — fills the aspect-ratio box */
+/* Background image in normal flow — widget height = rendered image height */
 .sotd-bg {
-    position: absolute;
-    inset: 0;
+    display: block;
     width: 100%;
-    height: 100%;
-    object-fit: fill;
+    height: auto;
     pointer-events: none;
     user-select: none;
 }
 
-/* Controls + title row — sits below the handwritten "song of the day" text */
+/* Controls + title row — below the "song of the day" handwritten text */
 .sotd-overlay {
     position: absolute;
-    left: 12%;
-    top: 59%;
-    width: 76%;
-    height: 30%;
+    left: 14%;
+    top: 66%;
+    width: 72%;
+    height: 22%;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -222,7 +219,7 @@ body {
 
 .contact-img {
     display: block;
-    height: clamp(74px, 10.5vh, 108px);
+    height: clamp(90px, 13vh, 135px);
     width: auto;
     max-width: 100%;
 }
