@@ -5,154 +5,354 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arham's Website</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="stylesheet" href="./css/style.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-
-
+    <link rel="stylesheet" href="./css/menu.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,600;0,700;1,800&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <section class="hero">
-        <div class="container py-4">
-            <div class="row align-items-center g-4">
 
-                <!-- LEFT -->
-                <div class="col-12 col-lg-6">
-                    <div class="left">
-                        <div class="left-text">
-                            <div class="welcome-img-wrapper">
-                                <img src="./images/longdog-removebg-preview.png" class="welcome-img img-fluid"
-                                    alt="Welcome">
-                            </div>
-                            <p>Hi, my name is Arham. I'm a computer engineering student at the University of Toronto.
-                            </p>
-                            <p>The purpose of this website is to (hopefully) serve as the closest representation of me
-                                and the things I love to do.</p>
-                        </div>
-                    </div>
-                </div>
+    <!-- Shared SVG filter definitions -->
+    <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <filter id="pencil-rough" x="-20%" y="-1%" width="140%" height="102%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.65 0.008" numOctaves="4" seed="17" result="noise"/>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+        </defs>
+    </svg>
 
-                <!-- RIGHT -->
-                <div class="col-12 col-lg-6">
-                    <div class="right">
-                        <div id="rightCarousel" class="carousel slide" data-bs-ride="carousel">
+    <!-- Left panel -->
+    <div class="left-panel">
 
-                            <div class="carousel-indicators">
-                                <button type="button" data-bs-target="#rightCarousel" data-bs-slide-to="0"
-                                    class="active" aria-current="true" aria-label="Slide 1"></button>
-                                <button type="button" data-bs-target="#rightCarousel" data-bs-slide-to="1"
-                                    aria-label="Slide 2"></button>
-                                <button type="button" data-bs-target="#rightCarousel" data-bs-slide-to="2"
-                                    aria-label="Slide 3"></button>
-                                <button type="button" data-bs-target="#rightCarousel" data-bs-slide-to="3"
-                                    aria-label="Slide 4"></button>
-                                <button type="button" data-bs-target="#rightCarousel" data-bs-slide-to="4"
-                                    aria-label="Slide 5"></button>
-                            </div>
-
-                            <div class="carousel-inner">
-                                <div class="carousel-item active">
-                                    <img src="./images/image1.jpeg" class="d-block w-100 right-img" alt="Slide 1">
-                                </div>
-                                <div class="carousel-item">
-                                    <img src="./images/image2.jpeg" class="d-block w-100 right-img" alt="Slide 2">
-                                </div>
-                                <div class="carousel-item">
-                                    <img src="./images/image3.jpeg" class="d-block w-100 right-img" alt="Slide 3">
-                                </div>
-                                <div class="carousel-item">
-                                    <img src="./images/image4.jpeg" class="d-block w-100 right-img" alt="Slide 4">
-                                </div>
-                                <div class="carousel-item">
-                                    <img src="./images/image5.jpg" class="d-block w-100 right-img" alt="Slide 5">
-                                </div>
-                            </div>
-
-                            <button class="carousel-control-prev" type="button" data-bs-target="#rightCarousel"
-                                data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous</span>
-                            </button>
-
-                            <button class="carousel-control-next" type="button" data-bs-target="#rightCarousel"
-                                data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next</span>
-                            </button>
-
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <section class="stuff">
-        <div class="container">
-            <div class="things">
-                <div class="list">
-                    <div class="projects">
-                        <p class="heading">Projects/Things I do</p>
-
-                        <a href="projects.html" class="img-link">
-                            <img class="wg" src="images/battery.jpg" alt="Projects">
-                        </a>
-                    </div>
-
-                    <div class="fitness">
-                        <p class="heading">Fitness</p>
-                        <a href="fitness.html" class="img-link">
-                            <img class="wg" src="images/buff.jpg" alt="Fitness">
-                        </a>
-                    </div>
-
-                    <div class="music">
-                        <p class="heading">Music I Like</p>
-                        <a href="music.html" class="img-link">
-                            <img class="wg" src="images/Prayers_for_paris.jpg" alt="Music">
-                        </a>
-                    </div>
-
-                    <div class="games">
-                        <p class="heading">Games I Appreciate</p>
-                        <a href="games.html" class="img-link">
-                            <img class="wg" src="images/game.jpg" alt="Games">
-                        </a>
-                    </div>
-
-                    <div class="contact">
-                        <p class="c heading">contact</p>
-
-                        <p>
-                            Email —
-                            <a href="mailto:arham.aamir@mail.utoronto.ca">
-                                arham.aamir@mail.utoronto.ca
-                            </a>
-                        </p>
-
-                        <p>
-                            LinkedIn —
-                            <a href="https://linkedin.com/in/arham-aamir" target="_blank">
-                                linkedin.com/in/arham-aamir
-                            </a>
-                        </p>
-
-                        <p>
-                            GitHub —
-                            <a href="https://github.com/arhamaamir1406" target="_blank">
-                                github.com/arhamaamir1406
-                            </a>
-                        </p>
-                    </div>
-
+        <!-- Song of the Day — image shell with album art + ticker overlaid -->
+        <div class="sotd-section">
+            <div class="sotd-widget">
+                <img class="sotd-bg" src="images/songoftheday.png" alt="Song of the Day">
+                <audio id="sotdAudio" preload="none"></audio>
+                <div class="sotd-overlay">
+                    <button class="sotd-play" id="sotdPlay" aria-label="Play">▶</button>
+                    <span class="sotd-song-text" id="sotdTitle">♪</span>
+                    <input class="sotd-volume" id="sotdVolume" type="range" min="0" max="1" step="0.05" value="0.8" aria-label="Volume">
                 </div>
             </div>
         </div>
-    </section>
+
+        <!-- Menu -->
+        <div class="menu-section">
+            <nav class="menu-nav">
+                <ul class="menu-list" id="menuList">
+                    <li class="menu-item" data-href="intro.html">Introduction</li>
+                    <li class="menu-item" data-href="projects.html">Projects / Things I Do</li>
+                    <li class="menu-item" data-href="fitness.html">Fitness</li>
+                    <li class="menu-item" data-href="music.html">Music I Like</li>
+                    <li class="menu-item" data-href="games.html">Games I Appreciate</li>
+                    <li class="menu-item" data-href="old.html">Old Website</li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Contacts — 2-column: LinkedIn+GitHub left, Email right -->
+        <div class="contacts-section">
+            <div class="contacts-left">
+                <a href="https://linkedin.com/in/arham-aamir" target="_blank" rel="noopener" class="contact-link" id="c-linkedin">
+                    <img class="contact-img" src="images/linkedin.jpg" alt="LinkedIn: linkedin.com/in/arham-aamir">
+                </a>
+                <a href="https://github.com/arhamaamir1406" target="_blank" rel="noopener" class="contact-link" id="c-github">
+                    <img class="contact-img" src="images/github.jpg" alt="GitHub: github.com/arhamaamir1406">
+                </a>
+            </div>
+            <div class="contacts-right">
+                <a href="mailto:arham.aamir@mail.utoronto.ca" class="contact-link" id="c-email">
+                    <img class="contact-img" src="images/email.jpg" alt="Email: arham.aamir@mail.utoronto.ca">
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Pencil squiggly divider -->
+    <svg class="divider" viewBox="0 0 60 1000" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+            d="M30,0 C23,22 38,48 25,70 C15,95 45,120 30,145 C20,168 40,190 28,215 C18,238 42,260 30,285 C22,308 37,330 25,352 C16,375 44,398 30,420 C20,442 40,465 28,488 C18,510 43,533 30,555 C21,578 39,600 27,622 C18,645 43,668 30,690 C21,712 40,735 28,758 C18,780 42,802 30,825 C22,847 38,868 26,890 C17,912 43,933 30,955 C22,972 35,985 30,1000"
+            stroke="#000" stroke-width="7" fill="none" filter="url(#pencil-rough)"
+            stroke-linecap="round" stroke-linejoin="round" opacity="0.07"/>
+        <path
+            d="M30,0 C23,22 38,48 25,70 C15,95 45,120 30,145 C20,168 40,190 28,215 C18,238 42,260 30,285 C22,308 37,330 25,352 C16,375 44,398 30,420 C20,442 40,465 28,488 C18,510 43,533 30,555 C21,578 39,600 27,622 C18,645 43,668 30,690 C21,712 40,735 28,758 C18,780 42,802 30,825 C22,847 38,868 26,890 C17,912 43,933 30,955 C22,972 35,985 30,1000"
+            stroke="#1c1c1c" stroke-width="2.5" fill="none" filter="url(#pencil-rough)"
+            stroke-linecap="round" stroke-linejoin="round" opacity="0.82"/>
+    </svg>
+
+    <!-- Right panel: all scattered images — click to enlarge, drag to move -->
+    <div class="right-panel">
+        <!-- Row 1 -->
+        <img class="scatter s-buff"      src="images/buff.jpg"               alt="">
+        <img class="scatter s-img4"      src="images/image4.jpeg"            alt="">
+        <img class="scatter s-haxorus"   src="https://play.pokemonshowdown.com/sprites/ani/haxorus.gif" alt="Haxorus">
+        <img class="scatter s-sade2"     src="images/sade2.gif"              alt="">
+        <img class="scatter s-folk"      src="images/folk.jpg"               alt="">
+        <!-- Row 2 -->
+        <img class="scatter s-img5"      src="images/image5.jpg"             alt="">
+        <img class="scatter s-family"    src="images/family.jpg"             alt="">
+        <img class="scatter s-prayers"   src="images/Prayers_for_paris.jpg"  alt="">
+        <img class="scatter s-gengar"    src="https://play.pokemonshowdown.com/sprites/ani/gengar.gif"  alt="Gengar">
+        <!-- Row 3 -->
+        <img class="scatter s-pmilk"     src="images/pmilk.jpg"              alt="">
+        <img class="scatter s-getout"    src="images/getout.gif"             alt="">
+        <img class="scatter s-car"       src="images/car.jpg"                alt="">
+        <img class="scatter s-nba"       src="images/nba.jpg"                alt="">
+        <!-- Row 4 -->
+        <img class="scatter s-bear"      src="images/bear.gif"               alt="">
+        <img class="scatter s-dragonite" src="https://play.pokemonshowdown.com/sprites/ani/dragonite.gif" alt="Dragonite">
+        <img class="scatter s-img3"      src="images/image3.jpeg"            alt="">
+        <img class="scatter s-jazz"      src="images/jazz.jpg"               alt="">
+        <img class="scatter s-son"       src="images/son.jpg"                alt="">
+        <!-- Row 5 -->
+        <img class="scatter s-longdog"   src="images/longdog.jpg"            alt="">
+        <img class="scatter s-dam"       src="images/dam.jpg"                alt="">
+        <img class="scatter s-faces"     src="images/faces.jpg"              alt="">
+        <img class="scatter s-tennis"    src="images/tennis.jpg"             alt="">
+    </div>
+
+    <!-- Lightbox overlay -->
+    <div class="lightbox" id="lightbox">
+        <img class="lightbox-img" id="lightboxImg" src="" alt="">
+    </div>
+
+    <script>
+        /* ── MENU NAVIGATION ── */
+        const items = document.querySelectorAll('.menu-item');
+        let activeIdx = 0;
+
+        function update() {
+            items.forEach((item, i) => {
+                item.dataset.pos = i - activeIdx;
+                item.classList.toggle('active', i === activeIdx);
+            });
+        }
+
+        function go() {
+            const href = items[activeIdx]?.dataset.href;
+            if (href) window.location.href = href;
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowDown') { activeIdx = Math.min(activeIdx + 1, items.length - 1); update(); e.preventDefault(); }
+            else if (e.key === 'ArrowUp') { activeIdx = Math.max(activeIdx - 1, 0); update(); e.preventDefault(); }
+            else if (e.key === 'Enter') { go(); e.preventDefault(); }
+            else if (e.key === 'Escape') { lightbox.classList.remove('open'); }
+        });
+
+        items.forEach((item, i) => {
+            item.addEventListener('mouseenter', () => { activeIdx = i; update(); });
+            item.addEventListener('click', () => { activeIdx = i; update(); go(); });
+        });
+
+        update();
+
+        /* ── SONG OF THE DAY ── */
+        const TRACKS = [
+            // BJam playlist
+            { title: "Funky Galileo",               artist: "Sure Sure" },
+            { title: "As the World Caves In",        artist: "Matt Maltese" },
+            { title: "24 / 7 / 365",                artist: "Surfaces" },
+            { title: "Television / So Far So Good",  artist: "Rex Orange County" },
+            { title: "Best Friend",                  artist: "Rex Orange County" },
+            { title: "Always",                       artist: "Rex Orange County" },
+            { title: "Sunflower",                    artist: "Rex Orange County" },
+            { title: "Cherry Wine",                  artist: "grentperez" },
+            { title: "Clementine",                   artist: "grentperez" },
+            { title: "Dark Red",                     artist: "Steve Lacy" },
+            { title: "Dangerous",                    artist: "Michael Jackson" },
+            { title: "Only If",                      artist: "Steve Lacy" },
+            { title: "N Side",                       artist: "Steve Lacy" },
+            { title: "Infrunami",                    artist: "Steve Lacy" },
+            { title: "Static",                       artist: "Steve Lacy" },
+            { title: "Some",                         artist: "Steve Lacy" },
+            { title: "Chamber of Reflection",        artist: "Mac DeMarco" },
+            { title: "White Ferrari",                artist: "Frank Ocean" },
+            { title: "Heroes",                       artist: "David Bowie" },
+            { title: "Lost Ones",                    artist: "Ms. Lauryn Hill" },
+            { title: "Heaven Can Wait",              artist: "Michael Jackson" },
+            { title: "Leave the Door Open",          artist: "Silk Sonic" },
+            { title: "The Chain",                    artist: "Fleetwood Mac" },
+            { title: "Jigsaw Falling Into Place",    artist: "Radiohead" },
+            // 2017jam playlist
+            { title: "Miss the Rage",                artist: "Trippie Redd" },
+            { title: "Shoota",                       artist: "Playboi Carti" },
+            { title: "XO Tour Llif3",               artist: "Lil Uzi Vert" },
+            { title: "Myron",                        artist: "Lil Uzi Vert" },
+            { title: "Hurricane",                    artist: "Kanye West" },
+            { title: "Off the Grid",                 artist: "Kanye West" },
+            { title: "Sky",                          artist: "Playboi Carti" },
+            { title: "Bound 2",                      artist: "Kanye West" },
+            { title: "lost souls",                   artist: "Baby Keem" },
+            { title: "range brothers",               artist: "Baby Keem" },
+            { title: "Alright",                      artist: "Kendrick Lamar" },
+            { title: "Location",                     artist: "Playboi Carti" },
+            { title: "wokeuplikethis*",              artist: "Playboi Carti" },
+            { title: "Monëy so big",                artist: "Yeat" },
+            { title: "16",                           artist: "Baby Keem" },
+            { title: "Yessirskiii",                  artist: "Lil Uzi Vert" },
+        ];
+
+        async function loadSOTD() {
+            const now = new Date();
+            const dayOfYear = Math.floor(
+                (Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(now.getFullYear(), 0, 0))
+                / 86400000
+            );
+            const track = TRACKS[dayOfYear % TRACKS.length];
+            setTicker(`${track.title}  —  ${track.artist}`);
+            try {
+                const q = encodeURIComponent(`${track.title} ${track.artist}`);
+                const res = await fetch(`https://itunes.apple.com/search?term=${q}&media=music&entity=song&limit=1`);
+                const data = await res.json();
+                if (data.results && data.results.length > 0) {
+                    const r = data.results[0];
+                    if (r.previewUrl) document.getElementById('sotdAudio').src = r.previewUrl;
+                    setTicker(`${r.trackName}  —  ${r.artistName}`);
+                }
+            } catch (_) {}
+        }
+
+        function setTicker(text) {
+            const el = document.getElementById('sotdTitle');
+            if (el) el.textContent = text;
+        }
+
+        loadSOTD();
+
+        /* ── SONG PLAYER ── */
+        const sotdAudio = document.getElementById('sotdAudio');
+        const sotdPlayBtn = document.getElementById('sotdPlay');
+        const sotdVolumeInput = document.getElementById('sotdVolume');
+
+        sotdPlayBtn.addEventListener('click', () => {
+            if (sotdAudio.paused) {
+                sotdAudio.play();
+                sotdPlayBtn.textContent = '⏸';
+                sotdPlayBtn.classList.add('playing');
+            } else {
+                sotdAudio.pause();
+                sotdPlayBtn.textContent = '▶';
+                sotdPlayBtn.classList.remove('playing');
+            }
+        });
+
+        sotdAudio.addEventListener('ended', () => {
+            sotdPlayBtn.textContent = '▶';
+            sotdPlayBtn.classList.remove('playing');
+        });
+
+        sotdVolumeInput.addEventListener('input', () => {
+            sotdAudio.volume = parseFloat(sotdVolumeInput.value);
+        });
+
+        /* ── DRAGGABLE IMAGES + LIGHTBOX ── */
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightboxImg');
+
+        function openLightbox(src) {
+            lightboxImg.src = src;
+            lightbox.classList.add('open');
+        }
+
+        lightbox.addEventListener('click', () => lightbox.classList.remove('open'));
+
+        // Single shared mouse-move/up handler to avoid per-element window listeners
+        let activeDrag = null;
+
+        window.addEventListener('mousemove', e => {
+            if (!activeDrag) return;
+            activeDrag.move(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (!activeDrag) return;
+            activeDrag.end();
+            activeDrag = null;
+        });
+
+        document.querySelectorAll('.scatter').forEach(el => {
+            let startX, startY, baseLeft, baseTop;
+            let moved = false;
+            let longPressTimer = null;
+            let touchDragging = false;
+
+            function initDrag(cx, cy) {
+                const parentRect = el.offsetParent.getBoundingClientRect();
+                const elRect = el.getBoundingClientRect();
+                baseLeft = elRect.left - parentRect.left;
+                baseTop  = elRect.top  - parentRect.top;
+                startX = cx; startY = cy;
+                moved = false;
+                // Lock position to pixels so CSS rules don't fight JS
+                el.style.left       = baseLeft + 'px';
+                el.style.top        = baseTop  + 'px';
+                el.style.right      = 'auto';
+                el.style.bottom     = 'auto';
+                el.style.zIndex     = '200';
+                el.style.transition = 'none';
+                document.body.style.userSelect = 'none';
+            }
+
+            function applyMove(cx, cy) {
+                const dx = cx - startX, dy = cy - startY;
+                if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+                el.style.left = (baseLeft + dx) + 'px';
+                el.style.top  = (baseTop  + dy) + 'px';
+            }
+
+            function finishDrag() {
+                el.style.zIndex     = '50'; // stays above non-dragged images
+                el.style.transition = '';
+                document.body.style.userSelect = '';
+                if (!moved) openLightbox(el.currentSrc || el.src);
+            }
+
+            /* ── mouse (desktop) ── */
+            el.addEventListener('mousedown', e => {
+                if (e.button !== 0) return;
+                initDrag(e.clientX, e.clientY);
+                activeDrag = { move: applyMove, end: finishDrag };
+                e.preventDefault();
+            });
+
+            /* ── touch (mobile) ── */
+            el.addEventListener('touchstart', e => {
+                const t = e.touches[0];
+                startX = t.clientX; startY = t.clientY;
+                moved = false; touchDragging = false;
+                longPressTimer = setTimeout(() => {
+                    touchDragging = true;
+                    initDrag(t.clientX, t.clientY);
+                }, 500);
+            }, { passive: true });
+
+            el.addEventListener('touchmove', e => {
+                const t = e.touches[0];
+                const dx = t.clientX - startX, dy = t.clientY - startY;
+                if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+                    moved = true;
+                    if (!touchDragging) clearTimeout(longPressTimer);
+                }
+                if (touchDragging) {
+                    applyMove(t.clientX, t.clientY);
+                    e.preventDefault();
+                }
+            }, { passive: false });
+
+            el.addEventListener('touchend', () => {
+                clearTimeout(longPressTimer);
+                if (touchDragging) {
+                    finishDrag();
+                    touchDragging = false;
+                } else if (!moved) {
+                    openLightbox(el.currentSrc || el.src);
+                }
+            });
+        });
+    </script>
+
 </body>
-
 </html>

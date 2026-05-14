@@ -1,0 +1,446 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #fff;
+}
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: #fff;
+}
+
+/* ── LEFT PANEL ─────────────────────────────────────────── */
+.left-panel {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 45%;
+    height: 100%;
+    background: #fff;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 5%;
+    overflow: hidden;
+}
+
+/* ── SOTD SECTION (top, flex: 1) ────────────────────────── */
+.sotd-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+}
+
+/* The widget container — aspect-ratio gives definite height so child % work */
+.sotd-widget {
+    position: relative;
+    width: min(96%, 460px);
+    aspect-ratio: 1260 / 480;
+}
+
+/* Hand-drawn oval image — fills the aspect-ratio box */
+.sotd-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Controls + title row — sits below the handwritten "song of the day" text */
+.sotd-overlay {
+    position: absolute;
+    left: 12%;
+    top: 59%;
+    width: 76%;
+    height: 30%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 7px;
+    overflow: hidden;
+}
+
+.sotd-play {
+    background: none;
+    border: 1.5px solid #111;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    font-size: 0.58rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #111;
+    padding: 0 0 0 2px;
+    flex-shrink: 0;
+    transition: background 0.1s;
+    line-height: 1;
+}
+.sotd-play:hover { background: #f0f0f0; }
+.sotd-play.playing { padding-left: 0; }
+
+.sotd-song-text {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.68rem;
+    font-weight: 800;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #111;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sotd-volume {
+    width: 58px;
+    height: 3px;
+    accent-color: #e8000a;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* ── MENU SECTION (middle, auto height) ─────────────────── */
+.menu-section {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+}
+
+.menu-nav {
+    width: 100%;
+    text-align: left;
+}
+
+.menu-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* ── MENU ITEMS ──────────────────────────────────────────── */
+.menu-item {
+    cursor: pointer;
+    font-weight: 800;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    line-height: 1.0;
+    user-select: none;
+    padding: 5px 0;
+    position: relative;
+    z-index: 1;
+    white-space: nowrap;
+    transition: font-size 0.1s ease-out, color 0.1s ease-out;
+}
+
+.menu-item[data-pos="-5"],
+.menu-item[data-pos="-4"],
+.menu-item[data-pos="-3"] { font-size: clamp(0.75rem, 0.85vw, 1.1rem);  color: rgba(0,0,0,0.12); }
+.menu-item[data-pos="-2"]  { font-size: clamp(0.85rem, 0.98vw, 1.3rem);  color: rgba(0,0,0,0.20); }
+.menu-item[data-pos="-1"]  { font-size: clamp(1.1rem,  1.3vw,  1.7rem);  color: rgba(0,0,0,0.38); }
+.menu-item[data-pos="0"]   { font-size: clamp(2.2rem,  2.6vw,  3.5rem);  color: #000; }
+.menu-item[data-pos="1"]   { font-size: clamp(1.7rem,  2.0vw,  2.7rem);  color: rgba(0,0,0,0.82); }
+.menu-item[data-pos="2"]   { font-size: clamp(1.35rem, 1.6vw,  2.2rem);  color: rgba(0,0,0,0.62); }
+.menu-item[data-pos="3"]   { font-size: clamp(1.1rem,  1.3vw,  1.75rem); color: rgba(0,0,0,0.45); }
+.menu-item[data-pos="4"]   { font-size: clamp(0.95rem, 1.1vw,  1.45rem); color: rgba(0,0,0,0.32); }
+.menu-item[data-pos="5"]   { font-size: clamp(0.8rem,  0.95vw, 1.2rem);  color: rgba(0,0,0,0.22); }
+
+.menu-item.active {
+    color: #000 !important;
+    z-index: 2;
+    text-shadow: 4px 4px 0 #e8000a, 2px 2px 0 rgba(232,0,10,0.6);
+}
+
+.menu-item.active::before {
+    content: '';
+    position: absolute;
+    top: 7px;
+    bottom: 7px;
+    left: -18px;
+    right: -12px;
+    background: #e6e6e6;
+    transform: skewX(-13deg);
+    z-index: -1;
+    animation: boxWipe 0.09s ease-out both;
+}
+
+@keyframes boxWipe {
+    from { clip-path: inset(0 100% 0 0); }
+    to   { clip-path: inset(0 0%   0 0); }
+}
+
+/* ── CONTACTS SECTION (bottom, flex: 1.5) ───────────────── */
+.contacts-section {
+    flex: 1.5;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4%;
+    min-height: 0;
+    overflow: hidden;
+    padding-bottom: 16px;
+    padding-top: 22px;
+}
+
+.contacts-left {
+    flex: 0 0 54%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    gap: 10px;
+    min-height: 0;
+}
+
+.contacts-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+}
+
+.contact-link {
+    display: block;
+    cursor: pointer;
+}
+
+.contact-img {
+    display: block;
+    height: clamp(74px, 10.5vh, 108px);
+    width: auto;
+    max-width: 100%;
+}
+
+/* ── RIGHT PANEL ─────────────────────────────────────────── */
+.right-panel {
+    position: fixed;
+    left: 45%;
+    top: 0;
+    width: 55%;
+    height: 100%;
+    background: #fff;
+    z-index: 1;
+    overflow: hidden;
+}
+
+/* ── PENCIL SQUIGGLY DIVIDER ─────────────────────────────── */
+.divider {
+    position: fixed;
+    left: calc(45% - 30px);
+    top: 0;
+    width: 60px;
+    height: 100vh;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* ── SCATTERED IMAGES ────────────────────────────────────── */
+.scatter {
+    position: absolute;
+    object-fit: contain;
+    cursor: grab;
+    touch-action: none; /* let JS handle all touch on these elements */
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.scatter:active { cursor: grabbing; }
+
+/* Pixel-art sprites */
+.s-haxorus, .s-dragonite, .s-gengar {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+/* ── ROW 1 (top 0–22%) ── */
+.s-buff {
+    max-width: 155px; max-height: 170px;
+    top: 7%;  left: 2%;
+    transform: rotate(-3deg);
+}
+.s-img4 {
+    max-width: 140px; max-height: 150px;
+    top: 4%;  left: 26%;
+    transform: rotate(4deg);
+}
+.s-haxorus {
+    width: clamp(88px, 8vw, 122px);
+    top: 5%;  left: 55%;
+    transform: rotate(3deg);
+}
+/* sade2 placed after haxorus in the DOM but given explicit z-index so it renders on top */
+.s-sade2 {
+    max-width: 130px; max-height: 140px;
+    top: 16%; left: 36%;
+    transform: rotate(-2deg);
+    z-index: 3;
+}
+.s-folk {
+    max-width: 145px; max-height: 152px;
+    top: 6%;  left: 72%;
+    transform: rotate(5deg);
+}
+
+/* ── ROW 2 (22–42%) ── */
+.s-img5 {
+    max-width: 140px; max-height: 150px;
+    top: 28%; left: 4%;
+    transform: rotate(-2deg);
+}
+.s-family {
+    max-width: 138px; max-height: 148px;
+    top: 24%; left: 26%;
+    transform: rotate(3deg);
+}
+.s-prayers {
+    max-width: 130px; max-height: 136px;
+    top: 22%; left: 48%;
+    transform: rotate(6deg);
+}
+.s-gengar {
+    width: clamp(74px, 6.8vw, 102px);
+    top: 34%; left: 68%;
+    transform: rotate(5deg);
+}
+
+/* ── ROW 3 (42–62%) ── */
+.s-pmilk {
+    max-width: 132px; max-height: 142px;
+    top: 44%; left: 4%;
+    transform: rotate(-5deg);
+}
+.s-getout {
+    max-width: 148px; max-height: 155px;
+    top: 46%; left: 28%;
+    transform: rotate(2deg);
+}
+.s-car {
+    max-width: 155px; max-height: 108px;
+    top: 50%; left: 56%;
+    transform: rotate(-4deg);
+}
+.s-nba {
+    max-width: 142px; max-height: 110px;
+    top: 53%; left: 80%;
+    transform: rotate(3deg);
+}
+
+/* ── ROW 4 (62–82%) ── */
+.s-bear {
+    max-width: 138px; max-height: 152px;
+    top: 62%; left: 4%;
+    transform: rotate(2deg);
+}
+.s-dragonite {
+    width: clamp(82px, 7.5vw, 115px);
+    top: 64%; left: 18%;
+    transform: rotate(-2deg);
+}
+.s-img3 {
+    max-width: 142px; max-height: 152px;
+    top: 66%; left: 32%;
+    transform: rotate(-4deg);
+}
+.s-jazz {
+    max-width: 140px; max-height: 150px;
+    top: 62%; left: 56%;
+    transform: rotate(5deg);
+}
+.s-son {
+    max-width: 145px; max-height: 155px;
+    top: 68%; left: 74%;
+    transform: rotate(-3deg);
+}
+
+/* ── ROW 5 (82–100%) ── */
+.s-longdog {
+    max-width: 195px; max-height: 110px;
+    top: 82%; left: 4%;
+    transform: rotate(-2deg);
+}
+.s-dam {
+    max-width: 150px; max-height: 112px;
+    top: 84%; left: 34%;
+    transform: rotate(3deg);
+}
+.s-faces {
+    max-width: 145px; max-height: 148px;
+    top: 82%; left: 58%;
+    transform: rotate(-4deg);
+}
+.s-tennis {
+    max-width: 148px; max-height: 115px;
+    top: 86%; left: 78%;
+    transform: rotate(2deg);
+}
+
+/* ── LIGHTBOX ─────────────────────────────────────────────── */
+.lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    z-index: 500;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+}
+
+.lightbox.open { display: flex; }
+
+.lightbox-img {
+    max-width: 88vw;
+    max-height: 88vh;
+    object-fit: contain;
+    cursor: default;
+    image-rendering: auto;
+    border-radius: 4px;
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 900px) {
+    html, body { overflow-y: auto; height: auto; }
+
+    .left-panel {
+        position: relative;
+        width: 100%;
+        height: auto;
+        overflow: visible;
+        padding: 24px 5%;
+    }
+
+    .sotd-section   { flex: 0 0 auto; padding-bottom: 20px; }
+    .menu-section   { flex: 0 0 auto; padding-bottom: 20px; }
+    .contacts-section {
+        flex: 0 0 auto;
+        justify-content: flex-start;
+        gap: 14px;
+        padding-bottom: 28px;
+        overflow: visible;
+    }
+
+    .right-panel {
+        position: relative;
+        left: 0;
+        width: 100%;
+        height: 520px;
+    }
+
+    .divider { display: none; }
+}
