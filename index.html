@@ -24,16 +24,29 @@
     <!-- Left panel -->
     <div class="left-panel">
 
-        <!-- Song of the Day — image shell with album art + ticker overlaid -->
-        <div class="sotd-section">
-            <div class="sotd-widget">
-                <img class="sotd-bg" src="images/songoftheday.png" alt="Song of the Day">
-                <audio id="sotdAudio" preload="none"></audio>
-                <div class="sotd-overlay">
-                    <button class="sotd-play" id="sotdPlay" aria-label="Play">▶</button>
-                    <span class="sotd-song-text" id="sotdTitle">♪</span>
-                    <input class="sotd-volume" id="sotdVolume" type="range" min="0" max="1" step="0.05" value="0.8" aria-label="Volume">
-                </div>
+        <!-- hello with per-letter flip interaction -->
+        <div class="hello-section">
+            <div class="hello-word" aria-label="hello">
+                <span class="hello-letter">
+                    <span class="letter-face letter-front">h</span>
+                    <span class="letter-face letter-back">y</span>
+                </span>
+                <span class="hello-letter">
+                    <span class="letter-face letter-front">e</span>
+                    <span class="letter-face letter-back">o</span>
+                </span>
+                <span class="hello-letter">
+                    <span class="letter-face letter-front">l</span>
+                    <span class="letter-face letter-back">o</span>
+                </span>
+                <span class="hello-letter">
+                    <span class="letter-face letter-front">l</span>
+                    <span class="letter-face letter-back">o</span>
+                </span>
+                <span class="hello-letter">
+                    <span class="letter-face letter-front">o</span>
+                    <span class="letter-face letter-back">o</span>
+                </span>
             </div>
         </div>
 
@@ -149,103 +162,19 @@
 
         update();
 
-        /* ── SONG OF THE DAY ── */
-        const TRACKS = [
-            // BJam playlist
-            { title: "Funky Galileo",               artist: "Sure Sure" },
-            { title: "As the World Caves In",        artist: "Matt Maltese" },
-            { title: "24 / 7 / 365",                artist: "Surfaces" },
-            { title: "Television / So Far So Good",  artist: "Rex Orange County" },
-            { title: "Best Friend",                  artist: "Rex Orange County" },
-            { title: "Always",                       artist: "Rex Orange County" },
-            { title: "Sunflower",                    artist: "Rex Orange County" },
-            { title: "Cherry Wine",                  artist: "grentperez" },
-            { title: "Clementine",                   artist: "grentperez" },
-            { title: "Dark Red",                     artist: "Steve Lacy" },
-            { title: "Dangerous",                    artist: "Michael Jackson" },
-            { title: "Only If",                      artist: "Steve Lacy" },
-            { title: "N Side",                       artist: "Steve Lacy" },
-            { title: "Infrunami",                    artist: "Steve Lacy" },
-            { title: "Static",                       artist: "Steve Lacy" },
-            { title: "Some",                         artist: "Steve Lacy" },
-            { title: "Chamber of Reflection",        artist: "Mac DeMarco" },
-            { title: "White Ferrari",                artist: "Frank Ocean" },
-            { title: "Heroes",                       artist: "David Bowie" },
-            { title: "Lost Ones",                    artist: "Ms. Lauryn Hill" },
-            { title: "Heaven Can Wait",              artist: "Michael Jackson" },
-            { title: "Leave the Door Open",          artist: "Silk Sonic" },
-            { title: "The Chain",                    artist: "Fleetwood Mac" },
-            { title: "Jigsaw Falling Into Place",    artist: "Radiohead" },
-            // 2017jam playlist
-            { title: "Miss the Rage",                artist: "Trippie Redd" },
-            { title: "Shoota",                       artist: "Playboi Carti" },
-            { title: "XO Tour Llif3",               artist: "Lil Uzi Vert" },
-            { title: "Myron",                        artist: "Lil Uzi Vert" },
-            { title: "Hurricane",                    artist: "Kanye West" },
-            { title: "Off the Grid",                 artist: "Kanye West" },
-            { title: "Sky",                          artist: "Playboi Carti" },
-            { title: "Bound 2",                      artist: "Kanye West" },
-            { title: "lost souls",                   artist: "Baby Keem" },
-            { title: "range brothers",               artist: "Baby Keem" },
-            { title: "Alright",                      artist: "Kendrick Lamar" },
-            { title: "Location",                     artist: "Playboi Carti" },
-            { title: "wokeuplikethis*",              artist: "Playboi Carti" },
-            { title: "Monëy so big",                artist: "Yeat" },
-            { title: "16",                           artist: "Baby Keem" },
-            { title: "Yessirskiii",                  artist: "Lil Uzi Vert" },
-        ];
+        /* ── HELLO LETTER FLIP ── */
+        document.querySelectorAll('.hello-letter').forEach(letter => {
+            let resetTimer = null;
 
-        async function loadSOTD() {
-            const now = new Date();
-            const dayOfYear = Math.floor(
-                (Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(now.getFullYear(), 0, 0))
-                / 86400000
-            );
-            const track = TRACKS[dayOfYear % TRACKS.length];
-            setTicker(`${track.title}  —  ${track.artist}`);
-            try {
-                const q = encodeURIComponent(`${track.title} ${track.artist}`);
-                const res = await fetch(`https://itunes.apple.com/search?term=${q}&media=music&entity=song&limit=1`);
-                const data = await res.json();
-                if (data.results && data.results.length > 0) {
-                    const r = data.results[0];
-                    if (r.previewUrl) document.getElementById('sotdAudio').src = r.previewUrl;
-                    setTicker(`${r.trackName}  —  ${r.artistName}`);
+            letter.addEventListener('mouseenter', () => {
+                clearTimeout(resetTimer);
+                letter.classList.toggle('flipped');
+                if (letter.classList.contains('flipped')) {
+                    resetTimer = setTimeout(() => {
+                        letter.classList.remove('flipped');
+                    }, 7000);
                 }
-            } catch (_) {}
-        }
-
-        function setTicker(text) {
-            const el = document.getElementById('sotdTitle');
-            if (el) el.textContent = text;
-        }
-
-        loadSOTD();
-
-        /* ── SONG PLAYER ── */
-        const sotdAudio = document.getElementById('sotdAudio');
-        const sotdPlayBtn = document.getElementById('sotdPlay');
-        const sotdVolumeInput = document.getElementById('sotdVolume');
-
-        sotdPlayBtn.addEventListener('click', () => {
-            if (sotdAudio.paused) {
-                sotdAudio.play();
-                sotdPlayBtn.textContent = '⏸';
-                sotdPlayBtn.classList.add('playing');
-            } else {
-                sotdAudio.pause();
-                sotdPlayBtn.textContent = '▶';
-                sotdPlayBtn.classList.remove('playing');
-            }
-        });
-
-        sotdAudio.addEventListener('ended', () => {
-            sotdPlayBtn.textContent = '▶';
-            sotdPlayBtn.classList.remove('playing');
-        });
-
-        sotdVolumeInput.addEventListener('input', () => {
-            sotdAudio.volume = parseFloat(sotdVolumeInput.value);
+            });
         });
 
         /* ── DRAGGABLE IMAGES + LIGHTBOX ── */
