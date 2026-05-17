@@ -15,7 +15,9 @@
     <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
         <defs>
             <filter id="pencil-rough" x="-20%" y="-1%" width="140%" height="102%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.65 0.008" numOctaves="4" seed="17" result="noise"/>
+                <feTurbulence type="fractalNoise" baseFrequency="0.65 0.008" numOctaves="4" seed="17" result="noise">
+                    <animate attributeName="seed" values="17;5;12;3;20;8;15;1;18;7;17" dur="0.6s" calcMode="discrete" repeatCount="indefinite"/>
+                </feTurbulence>
                 <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.5" xChannelSelector="R" yChannelSelector="G"/>
             </filter>
         </defs>
@@ -176,6 +178,47 @@
                 }
             });
         });
+
+        /* ── DIVIDER FLOW ── */
+        (function () {
+            const paths = document.querySelectorAll('.divider path');
+            // Exact original path coordinates — only x shifts, y stays fixed
+            const base = [
+                [30,0],
+                [23,22],[38,48],[25,70],
+                [15,95],[45,120],[30,145],
+                [20,168],[40,190],[28,215],
+                [18,238],[42,260],[30,285],
+                [22,308],[37,330],[25,352],
+                [16,375],[44,398],[30,420],
+                [20,442],[40,465],[28,488],
+                [18,510],[43,533],[30,555],
+                [21,578],[39,600],[27,622],
+                [18,645],[43,668],[30,690],
+                [21,712],[40,735],[28,758],
+                [18,780],[42,802],[30,825],
+                [22,847],[38,868],[26,890],
+                [17,912],[43,933],[30,955],
+                [22,972],[35,985],[30,1000]
+            ];
+            let phase = 0;
+
+            function buildPath(ph) {
+                const s = base.map(([x, y]) => [(x + 5 * Math.sin(2 * Math.PI * y / 145 + ph)).toFixed(2), y]);
+                let d = `M${s[0][0]},${s[0][1]}`;
+                for (let i = 1; i < s.length; i += 3)
+                    d += ` C${s[i][0]},${s[i][1]} ${s[i+1][0]},${s[i+1][1]} ${s[i+2][0]},${s[i+2][1]}`;
+                return d;
+            }
+
+            function tick() {
+                phase += 0.025;
+                const d = buildPath(phase);
+                paths.forEach(p => p.setAttribute('d', d));
+                requestAnimationFrame(tick);
+            }
+            tick();
+        }());
 
         /* ── DRAGGABLE IMAGES + LIGHTBOX ── */
         const lightbox = document.getElementById('lightbox');
