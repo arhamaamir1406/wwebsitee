@@ -1,0 +1,10 @@
+# Claude Code memory & settings — never push these
+.claude/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Environment / secrets
+.env
+*.env

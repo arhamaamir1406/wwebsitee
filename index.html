@@ -7,6 +7,136 @@
     <title>Arham's Website</title>
     <link rel="stylesheet" href="./css/menu.css" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,600;0,700;1,800&display=swap" rel="stylesheet">
+    <style>
+        /* ── INTRO WINDOW ─────────────────────────────────── */
+        #intro-window {
+            position: fixed;
+            left: 50%; top: 50%;
+            transform: translate(-50%, -50%) scale(0.06);
+            width: 62vw; max-width: 850px;
+            height: 65vh; min-height: 320px;
+            background: #fafafa;
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.42s cubic-bezier(0.34,1.28,0.64,1), opacity 0.28s ease;
+            overflow: visible;
+        }
+        #intro-window.win-visible {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            pointer-events: all;
+        }
+        #intro-window.win-dragging { transition: none; }
+        #intro-window.win-maximized {
+            width: 88vw !important; max-width: 88vw !important; height: 88vh !important;
+        }
+
+        .intro-border-svg {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; z-index: 20;
+            overflow: visible;
+        }
+
+        .intro-drag-handle {
+            position: absolute; top: 0; left: 0; right: 90px; height: 46px;
+            cursor: move; z-index: 15;
+        }
+
+        .intro-controls {
+            position: absolute; top: 11px; right: 16px;
+            display: flex; gap: 7px; z-index: 25; user-select: none;
+        }
+
+        .intro-btn {
+            width: 22px; height: 22px; border-radius: 50%;
+            border: 1.5px solid rgba(0,0,0,0.28);
+            background: rgba(245,245,245,0.9);
+            cursor: pointer; font-size: 13px; line-height: 1;
+            display: flex; align-items: center; justify-content: center;
+            font-family: monospace; color: #222; padding: 0;
+            transition: background 0.12s, color 0.12s, border-color 0.12s;
+        }
+        .intro-btn:hover { background: rgba(0,0,0,0.1); }
+        #intro-close:hover  { background: #e8000a; color: #fff; border-color: #e8000a; }
+        #intro-minimize:hover { background: #ffbd44; border-color: #d49b00; }
+        #intro-maximize:hover { background: #29c941; border-color: #1e9c30; }
+
+        .intro-label {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800; font-style: italic; text-transform: uppercase;
+            letter-spacing: 0.025em;
+            font-size: clamp(1.5rem, 2.8vw, 3.8rem);
+            line-height: 1;
+            color: #000;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .intro-label { transition: opacity 0.18s ease; }
+
+        .intro-content {
+            position: absolute; inset: 44px 20px 20px 20px;
+            display: flex; gap: 22px; overflow: hidden; z-index: 5;
+        }
+        .intro-photo {
+            flex-shrink: 0;
+            width: auto; max-width: 44%;
+            max-height: 100%; height: auto;
+            object-fit: contain;
+            border-radius: 2px;
+            align-self: center;
+            cursor: zoom-in;
+        }
+        .intro-text {
+            flex: 1; display: flex; flex-direction: column;
+            justify-content: flex-end; padding-bottom: 12%;
+            gap: 20px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(1.0rem, 1.15vw, 1.35rem);
+            line-height: 1.72; color: #1a1a1a;
+            overflow-y: auto; padding-right: 2px;
+        }
+
+        /* Flying text clone */
+        .intro-flyer {
+            position: fixed; pointer-events: none; z-index: 1000;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800; font-style: italic; text-transform: uppercase;
+            letter-spacing: 0.025em; color: #000;
+            white-space: nowrap; transform-origin: center center; line-height: 1;
+        }
+
+        /* ── DVD SCREENSAVER ─────────────────────────────── */
+        #dvd-overlay {
+            position: fixed; inset: 0;
+            background: #fff;
+            z-index: 400;
+            display: none;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        #dvd-logo {
+            position: absolute;
+            width: 200px; height: auto;
+            pointer-events: none;
+            will-change: left, top;
+        }
+        #dvd-hint {
+            position: absolute; bottom: 18px; left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.72rem; color: rgba(0,0,0,0.18);
+            pointer-events: none; user-select: none; white-space: nowrap;
+        }
+
+        /* Menu Introduction item when window is open */
+        .menu-item.intro-open {
+            color: transparent !important;
+            text-shadow: 4px 4px 0 #e8000a, 2px 2px 0 rgba(232,0,10,0.55) !important;
+            transition: color 0.12s ease !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -14,6 +144,12 @@
     <!-- Shared SVG filter definitions -->
     <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
         <defs>
+            <filter id="pencil-border" x="-8%" y="-8%" width="116%" height="116%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.012 0.012" numOctaves="4" seed="23" result="noise">
+                    <animate attributeName="seed" values="23;7;31;14;42;19;23" dur="0.7s" calcMode="discrete" repeatCount="indefinite"/>
+                </feTurbulence>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
             <filter id="pencil-rough" x="-20%" y="-1%" width="140%" height="102%">
                 <feTurbulence type="fractalNoise" baseFrequency="0.65 0.008" numOctaves="4" seed="17" result="noise">
                     <animate attributeName="seed" values="17;5;12;3;20;8;15;1;18;7;17" dur="0.6s" calcMode="discrete" repeatCount="indefinite"/>
@@ -128,6 +264,41 @@
         <img class="scatter s-tennis"    src="images/tennis.jpg"             alt="">
     </div>
 
+    <!-- Intro Window -->
+    <div id="intro-window">
+        <!-- Animated pencil border -->
+        <svg class="intro-border-svg" id="intro-border-svg" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+            <rect id="intro-border-rect" x="4" y="4" width="0" height="0"
+                stroke="#1c1c1c" stroke-width="4" fill="none"
+                filter="url(#pencil-border)"
+                stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+        </svg>
+        <!-- Drag handle -->
+        <div class="intro-drag-handle" id="intro-drag-handle"></div>
+        <!-- Window controls -->
+        <div class="intro-controls">
+            <button class="intro-btn" id="intro-minimize" title="Minimize">−</button>
+            <button class="intro-btn" id="intro-maximize" title="Maximize">□</button>
+            <button class="intro-btn" id="intro-close" title="Close">×</button>
+        </div>
+        <!-- Content -->
+        <div class="intro-content">
+            <img src="./images/intro.jpg" class="intro-photo" alt="Arham">
+            <div class="intro-text">
+                <!-- Introduction label flies in from menu and lands here -->
+                <div class="intro-label" id="intro-label">Introduction</div>
+                <p>Hi, my name is Arham. I'm a computer engineering student at the University of Toronto.</p>
+                <p>The purpose of this website is to (hopefully) serve as the closest representation of me and the things I love to do.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- DVD Screensaver -->
+    <div id="dvd-overlay">
+        <img id="dvd-logo" src="./images/longdog-removebg-preview.png" alt="">
+        <p id="dvd-hint">click anywhere or esc to go back</p>
+    </div>
+
     <!-- Lightbox overlay -->
     <div class="lightbox" id="lightbox">
         <img class="lightbox-img" id="lightboxImg" src="" alt="">
@@ -153,16 +324,237 @@
         document.addEventListener('keydown', e => {
             if (e.key === 'ArrowDown') { activeIdx = Math.min(activeIdx + 1, items.length - 1); update(); e.preventDefault(); }
             else if (e.key === 'ArrowUp') { activeIdx = Math.max(activeIdx - 1, 0); update(); e.preventDefault(); }
-            else if (e.key === 'Enter') { go(); e.preventDefault(); }
-            else if (e.key === 'Escape') { lightbox.classList.remove('open'); }
+            else if (e.key === 'Enter') {
+                if (activeIdx === 0) { openIntroWindow(); }
+                else if (activeIdx === items.length - 1) { go(); }
+                else { openDvd(); }
+                e.preventDefault();
+            }
+            else if (e.key === 'Escape') {
+                if (dvdOpen) { closeDvd(); }
+                else if (introOpen || introMinimized) { closeIntroWindow(); }
+                lightbox.classList.remove('open');
+            }
         });
 
         items.forEach((item, i) => {
             item.addEventListener('mouseenter', () => { activeIdx = i; update(); });
-            item.addEventListener('click', () => { activeIdx = i; update(); go(); });
+            item.addEventListener('click', () => {
+                activeIdx = i; update();
+                if (i === 0) { openIntroWindow(); }
+                else if (i === items.length - 1) { go(); }
+                else { openDvd(); }
+            });
         });
 
         update();
+
+        /* ── INTRO WINDOW ── */
+        const introWin      = document.getElementById('intro-window');
+        const introBorderRect = document.getElementById('intro-border-rect');
+        const introLabel    = document.getElementById('intro-label');
+        const introDragHdl  = document.getElementById('intro-drag-handle');
+        const introItem     = items[0];
+
+        let introOpen = false, introMinimized = false, introMaximized = false;
+        let activeFlyer = null;
+        let winDrag = null;
+
+        function updateBorderRect() {
+            const w = introWin.offsetWidth, h = introWin.offsetHeight;
+            introBorderRect.setAttribute('width',  w - 8);
+            introBorderRect.setAttribute('height', h - 8);
+        }
+
+        function openIntroWindow() {
+            if (introMinimized) {
+                introMinimized = false;
+                introWin.style.left = introWin.style.top = '';
+                introWin.style.transform = '';
+                introWin.classList.add('win-visible');
+                return; // history state already pushed when intro first opened
+            }
+            if (introOpen) return;
+            introOpen = true;
+            history.pushState({ overlay: 'intro' }, '');
+
+            // Reset to centered
+            introWin.style.left = introWin.style.top = '';
+            introWin.style.transform = '';
+            introWin.style.width = introWin.style.height = '';
+            introWin.classList.remove('label-visible', 'win-maximized');
+            introWin.classList.add('win-visible');
+            setTimeout(updateBorderRect, 20);
+
+            // After window finishes opening, launch flying text
+            setTimeout(() => { if (introOpen) flyIntroText(); }, 440);
+        }
+
+        function flyIntroText() {
+            const menuRect  = introItem.getBoundingClientRect();
+            const labelRect = introLabel.getBoundingClientRect();
+            const srcFontSize = parseFloat(window.getComputedStyle(introItem).fontSize);
+            const tgtFontSize = parseFloat(window.getComputedStyle(introLabel).fontSize);
+            const scaleRatio  = tgtFontSize / srcFontSize;
+
+            if (activeFlyer) { activeFlyer.remove(); activeFlyer = null; }
+
+            const flyer = document.createElement('div');
+            flyer.className = 'intro-flyer';
+            flyer.textContent = 'Introduction';
+            flyer.style.fontSize = srcFontSize + 'px';
+            const menuCX = menuRect.left + menuRect.width / 2;
+            const menuCY = menuRect.top  + menuRect.height / 2;
+            flyer.style.left = menuCX + 'px';
+            flyer.style.top  = menuCY + 'px';
+            flyer.style.transform = 'translate(-50%, -50%)';
+            document.body.appendChild(flyer);
+            activeFlyer = flyer;
+
+            introItem.classList.add('intro-open');
+
+            const labelCX = labelRect.left + labelRect.width  / 2;
+            const labelCY = labelRect.top  + labelRect.height / 2;
+            const dx = labelCX - menuCX;
+            const dy = labelCY - menuCY;
+
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                // Flyer moves to label position, then fades out near the end
+                flyer.style.transition = 'transform 0.42s ease-out, opacity 0.18s ease-in 0.26s';
+                flyer.style.transform  = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(${scaleRatio})`;
+                flyer.style.opacity = '0';
+            }));
+
+            // Label fades in just as flyer fades out — single seamless motion
+            setTimeout(() => {
+                if (introOpen) introLabel.style.opacity = '1';
+            }, 290);
+
+            setTimeout(() => {
+                if (flyer === activeFlyer) { flyer.remove(); activeFlyer = null; }
+            }, 460);
+        }
+
+        function closeIntroWindow(silent = false) {
+            introWin.classList.remove('win-visible', 'win-maximized');
+            introLabel.style.opacity = '';
+            introOpen = introMinimized = introMaximized = false;
+            introItem.classList.remove('intro-open');
+            if (activeFlyer) { activeFlyer.remove(); activeFlyer = null; }
+            setTimeout(() => {
+                if (!introOpen) {
+                    introWin.style.left = introWin.style.top = '';
+                    introWin.style.transform = '';
+                    introWin.style.width = introWin.style.height = '';
+                }
+            }, 460);
+            if (!silent) history.back();
+        }
+
+        document.getElementById('intro-close').addEventListener('click', closeIntroWindow);
+
+        document.getElementById('intro-minimize').addEventListener('click', () => {
+            if (!introOpen && !introMinimized) return;
+            introMinimized = true; introOpen = false;
+            introWin.classList.remove('win-visible');
+            // Keep intro-open on menu item so red stays visible
+        });
+
+        document.querySelector('#intro-window .intro-photo').addEventListener('click', e => {
+            e.stopPropagation();
+            openLightbox(e.currentTarget.src);
+        });
+
+        document.getElementById('intro-maximize').addEventListener('click', () => {
+            introMaximized = !introMaximized;
+            // Always re-center on toggle so it doesn't drift after dragging
+            introWin.style.left = '50%'; introWin.style.top = '50%';
+            introWin.style.transform = 'translate(-50%, -50%)';
+            introWin.style.width = introWin.style.height = '';
+            introWin.classList.toggle('win-maximized', introMaximized);
+            setTimeout(updateBorderRect, 20);
+        });
+
+        /* ── DVD SCREENSAVER ── */
+        const dvdOverlay = document.getElementById('dvd-overlay');
+        const dvdLogo    = document.getElementById('dvd-logo');
+        let dvdAnimId = null, dvdOpen = false;
+        let dvdX, dvdY, dvdVX, dvdVY;
+        const DVD_SPEED = 2.2;
+        const DVD_HUES  = [0, 40, 80, 140, 185, 220, 270, 310];
+        let dvdHueIdx   = 0;
+
+        function dvdBump() {
+            dvdHueIdx = (dvdHueIdx + 1) % DVD_HUES.length;
+            dvdLogo.style.filter = `hue-rotate(${DVD_HUES[dvdHueIdx]}deg) saturate(1.4)`;
+        }
+
+        function dvdTick() {
+            const W = dvdOverlay.offsetWidth, H = dvdOverlay.offsetHeight;
+            const iW = dvdLogo.offsetWidth,   iH = dvdLogo.offsetHeight;
+            dvdX += dvdVX;
+            dvdY += dvdVY;
+            let hit = false;
+            if (dvdX <= 0)        { dvdX = 0;        dvdVX =  Math.abs(dvdVX); hit = true; }
+            else if (dvdX + iW >= W) { dvdX = W - iW; dvdVX = -Math.abs(dvdVX); hit = true; }
+            if (dvdY <= 0)        { dvdY = 0;        dvdVY =  Math.abs(dvdVY); hit = true; }
+            else if (dvdY + iH >= H) { dvdY = H - iH; dvdVY = -Math.abs(dvdVY); hit = true; }
+            if (hit) dvdBump();
+            dvdLogo.style.left = dvdX + 'px';
+            dvdLogo.style.top  = dvdY + 'px';
+            dvdAnimId = requestAnimationFrame(dvdTick);
+        }
+
+        function openDvd() {
+            dvdOpen = true;
+            history.pushState({ overlay: 'dvd' }, '');
+            dvdOverlay.style.display = 'block';
+            // Wait one frame so offsetWidth/Height are valid
+            requestAnimationFrame(() => {
+                const W = dvdOverlay.offsetWidth, H = dvdOverlay.offsetHeight;
+                dvdX = Math.random() * (W - 220);
+                dvdY = Math.random() * (H - 120);
+                dvdVX = DVD_SPEED * (Math.random() > 0.5 ? 1 : -1);
+                dvdVY = DVD_SPEED * (Math.random() > 0.5 ? 1 : -1);
+                dvdHueIdx = 0;
+                dvdLogo.style.filter = '';
+                dvdLogo.style.left = dvdX + 'px';
+                dvdLogo.style.top  = dvdY + 'px';
+                dvdAnimId = requestAnimationFrame(dvdTick);
+            });
+        }
+
+        function closeDvd(silent = false) {
+            if (!dvdOpen) return;
+            dvdOpen = false;
+            dvdOverlay.style.display = 'none';
+            if (dvdAnimId) { cancelAnimationFrame(dvdAnimId); dvdAnimId = null; }
+            if (!silent) history.back();
+        }
+
+        dvdOverlay.addEventListener('click', () => closeDvd());
+
+        /* ── BACK BUTTON / HISTORY ── */
+        window.addEventListener('popstate', () => {
+            if (dvdOpen)                       { closeDvd(true);          return; }
+            if (introOpen || introMinimized)   { closeIntroWindow(true);  return; }
+        });
+
+        /* ── WINDOW DRAG ── */
+        introDragHdl.addEventListener('mousedown', e => {
+            if (e.button !== 0) return;
+            const r = introWin.getBoundingClientRect();
+            if (!introWin.style.left) {
+                introWin.style.left = r.left + 'px';
+                introWin.style.top  = r.top  + 'px';
+                introWin.style.transform = 'none';
+            }
+            winDrag = { sx: e.clientX, sy: e.clientY,
+                        ol: parseFloat(introWin.style.left),
+                        ot: parseFloat(introWin.style.top) };
+            introWin.classList.add('win-dragging');
+            e.preventDefault();
+        });
 
         /* ── HELLO LETTER FLIP ── */
         document.querySelectorAll('.hello-letter').forEach(letter => {
@@ -235,14 +627,16 @@
         let activeDrag = null;
 
         window.addEventListener('mousemove', e => {
-            if (!activeDrag) return;
-            activeDrag.move(e.clientX, e.clientY);
+            if (activeDrag) activeDrag.move(e.clientX, e.clientY);
+            if (winDrag) {
+                introWin.style.left = (winDrag.ol + e.clientX - winDrag.sx) + 'px';
+                introWin.style.top  = (winDrag.ot + e.clientY - winDrag.sy) + 'px';
+            }
         });
 
         window.addEventListener('mouseup', () => {
-            if (!activeDrag) return;
-            activeDrag.end();
-            activeDrag = null;
+            if (activeDrag) { activeDrag.end(); activeDrag = null; }
+            if (winDrag) { winDrag = null; introWin.classList.remove('win-dragging'); }
         });
 
         document.querySelectorAll('.scatter').forEach(el => {
