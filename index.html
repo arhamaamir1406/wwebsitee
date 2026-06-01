@@ -327,6 +327,7 @@
             else if (e.key === 'Enter') {
                 if (activeIdx === 0) { openIntroWindow(); }
                 else if (activeIdx === items.length - 1) { go(); }
+                else if (items[activeIdx].dataset.href === 'games.html') { go(); }
                 else { openDvd(); }
                 e.preventDefault();
             }
@@ -343,6 +344,7 @@
                 activeIdx = i; update();
                 if (i === 0) { openIntroWindow(); }
                 else if (i === items.length - 1) { go(); }
+                else if (items[i].dataset.href === 'games.html') { go(); }
                 else { openDvd(); }
             });
         });

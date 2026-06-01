@@ -1,62 +1,497 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>games</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="stylesheet" href="./css/style.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <title>Games I Appreciate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+        html, body {
+            width: 100%; height: 100%;
+            background: #04060a;
+            overflow: hidden;
+            font-family: 'Inter', 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            user-select: none; -webkit-user-select: none;
+        }
 
+        /* ── BACKGROUND ─────────────────────────────────────── */
+        #ps-bg-a, #ps-bg-b {
+            position: fixed; inset: 0; z-index: 0;
+        }
+        #ps-bg-a img, #ps-bg-b img {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            filter: blur(52px) brightness(0.28) saturate(1.5);
+            transform: scale(1.14); /* prevent blur edge artifacts */
+        }
+        #ps-bg-b { opacity: 0; transition: opacity 0.75s ease; }
+        #ps-bg-b.ps-bg-visible { opacity: 1; }
+
+        /* Dark vignette overlay */
+        #ps-overlay {
+            position: fixed; inset: 0; z-index: 1; pointer-events: none;
+            background: linear-gradient(
+                180deg,
+                rgba(0,0,0,0.25) 0%,
+                rgba(0,0,0,0.0)  22%,
+                rgba(0,0,0,0.0)  50%,
+                rgba(0,0,0,0.55) 78%,
+                rgba(0,0,0,0.88) 100%
+            );
+        }
+
+        /* ── AMBIENT FLOOR GLOW ─────────────────────────────── */
+        #ps-ambient {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 2;
+            height: 55%; pointer-events: none;
+            transition: background 1.1s ease;
+        }
+
+        /* ── TOP BAR ────────────────────────────────────────── */
+        #ps-topbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+            height: 58px; padding: 0 52px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        #ps-back {
+            display: flex; align-items: center; gap: 7px;
+            color: rgba(255,255,255,0.55);
+            font-size: 0.78rem; font-weight: 500;
+            letter-spacing: 0.09em; text-transform: uppercase;
+            cursor: pointer; transition: color 0.15s;
+            text-decoration: none;
+        }
+        #ps-back:hover { color: rgba(255,255,255,0.9); }
+        #ps-back svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+        #ps-topright {
+            display: flex; align-items: center; gap: 22px;
+        }
+        #ps-time {
+            color: rgba(255,255,255,0.7);
+            font-size: 1.0rem; font-weight: 300;
+            letter-spacing: 0.06em;
+        }
+
+        /* Power / notification icons (decorative) */
+        .ps-icon {
+            width: 18px; height: 18px;
+            opacity: 0.55;
+            color: #fff;
+        }
+
+        /* ── STAGE ──────────────────────────────────────────── */
+        #ps-stage {
+            position: fixed; inset: 0; z-index: 10;
+            display: flex; flex-direction: column;
+            justify-content: flex-end;
+            padding-bottom: 52px;
+        }
+
+        /* ── GAME INFO ──────────────────────────────────────── */
+        #ps-info {
+            padding: 0 0 22px 122px;
+            min-height: 88px;
+            display: flex; flex-direction: column; justify-content: flex-end;
+        }
+
+        #ps-title {
+            font-size: clamp(1.7rem, 2.6vw, 2.9rem);
+            font-weight: 700; color: #fff;
+            letter-spacing: -0.025em; line-height: 1;
+            text-shadow: 0 2px 28px rgba(0,0,0,0.95), 0 0 60px rgba(0,0,0,0.6);
+            transition: opacity 0.22s ease;
+        }
+
+        #ps-meta {
+            margin-top: 9px;
+            font-size: 0.76rem; font-weight: 500;
+            color: rgba(255,255,255,0.45);
+            letter-spacing: 0.12em; text-transform: uppercase;
+            transition: opacity 0.22s ease;
+        }
+
+        /* ── CAROUSEL WRAPPER ───────────────────────────────── */
+        #ps-carousel-wrap {
+            height: 440px;
+            position: relative;
+            overflow: visible; /* cards to the left are allowed to bleed */
+        }
+
+        /* ── CAROUSEL ───────────────────────────────────────── */
+        #ps-carousel {
+            position: absolute; top: 0; left: 0;
+            display: flex;
+            align-items: flex-end; /* all cards sit on the same floor */
+            gap: 14px;
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+        }
+
+        /* ── CARD ───────────────────────────────────────────── */
+        .ps-card {
+            flex-shrink: 0;
+            border-radius: 13px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            transition:
+                width  0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                height 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.5s ease,
+                box-shadow 0.3s ease;
+        }
+
+        /* Four size states keyed by distance from active */
+        .ps-card.ps-d0 {
+            width: 296px; height: 395px;
+            opacity: 1;
+            box-shadow:
+                0 0 0 2.5px rgba(255,255,255,0.92),
+                0 0 0 4.5px rgba(255,255,255,0.08),
+                0 24px 64px rgba(0,0,0,0.65);
+        }
+        .ps-card.ps-d1 {
+            width: 208px; height: 277px;
+            opacity: 0.70;
+        }
+        .ps-card.ps-d2 {
+            width: 150px; height: 200px;
+            opacity: 0.38;
+        }
+        .ps-card.ps-d3 {
+            width: 110px; height: 147px;
+            opacity: 0.18;
+        }
+
+        .ps-card img {
+            width: 100%; height: 100%;
+            object-fit: cover; object-position: center top;
+            display: block; pointer-events: none;
+            transition: transform 0.12s ease-out;
+        }
+
+        /* Specular shine that follows the cursor */
+        .ps-shine {
+            position: absolute; inset: 0; border-radius: 13px;
+            pointer-events: none;
+            opacity: 0;
+            mix-blend-mode: screen;
+            transition: opacity 0.2s ease;
+        }
+
+        /* ── PROGRESS DOTS ──────────────────────────────────── */
+        #ps-dots {
+            display: flex; gap: 7px;
+            justify-content: flex-start;
+            padding: 0 0 0 122px;
+            margin-top: 18px;
+        }
+        .ps-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+        .ps-dot.ps-dot-active {
+            background: rgba(255,255,255,0.9);
+            transform: scale(1.3);
+        }
+
+        /* ── NAV HINTS ──────────────────────────────────────── */
+        #ps-hints {
+            position: fixed; bottom: 14px; left: 50%;
+            transform: translateX(-50%);
+            display: flex; gap: 26px;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.67rem; letter-spacing: 0.1em; text-transform: uppercase;
+            z-index: 50; white-space: nowrap;
+        }
+        .ps-hint { display: flex; align-items: center; gap: 5px; }
+        .ps-key {
+            min-width: 18px; height: 18px;
+            padding: 0 4px;
+            border: 1.5px solid rgba(255,255,255,0.28);
+            border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.6rem; font-weight: 600;
+        }
+
+        /* ── RESPONSIVE FALLBACK ────────────────────────────── */
+        @media (max-width: 700px) {
+            .ps-card.ps-d0 { width: 200px; height: 266px; }
+            .ps-card.ps-d1 { width: 140px; height: 186px; }
+            .ps-card.ps-d2 { width: 100px; height: 133px; }
+            .ps-card.ps-d3 { width: 72px;  height: 96px;  }
+            #ps-info { padding-left: 40px; }
+            #ps-dots { padding-left: 40px; }
+            #ps-topbar { padding: 0 20px; }
+        }
+    </style>
 </head>
-
 <body>
-    <section class="listoffitness order">
-        <div class="tennis">
-            <p class="prheading">Sekiro: Shadows Die Twice</p>
-            <img src="./images/sekiro-hero.jpg" class="tennisimg pictures">
-            <p>This is the best game of all time. This was my first soulslike and easily has the best mechanics. The
-                parrying is on point and every boss is just perfection.<br>
-                <br>
-                Hours: 112
-            </p>
-        </div>
 
-        <div class="WeightLifting">
-            <p class="prheading">Pokemon Black 2</p>
-            <img src="./images/815GvAb76VL.jpg" class="wlimg pictures">
-            <p>I have been playing Pokemon since I was a kid. So imagine my surprise when one of the games started
-                incorporating serious themes and world building. Basically, introduced me to story games and the pixel
-                art is beautiful.<br>
-                <br>
-                Hours: too many
-            </p>
-        </div>
+<!-- Double-buffered blurred background for smooth crossfade -->
+<div id="ps-bg-a"><img id="ps-bg-img-a" src="" alt=""></div>
+<div id="ps-bg-b"><img id="ps-bg-img-b" src="" alt=""></div>
+<div id="ps-overlay"></div>
+<div id="ps-ambient"></div>
 
-        <div class="running">
-            <p class="prheading">Metal Gear Solid</p>
-            <img src="./images/images.jpg" class="getout pictures">
-            <p>I love Hideo Kojima's style. He explores some of the deepest themes I've seen in media while providing
-                the most goofy story telling.<br>
-                <br>
-                Hours: 64
-            </p>
-        </div>
+<!-- Top bar -->
+<div id="ps-topbar">
+    <a id="ps-back" href="./index.html">
+        <svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9.5 2.5L5 7.5l4.5 5"/>
+        </svg>
+        Games I Appreciate
+    </a>
+    <div id="ps-topright">
+        <!-- Bell icon -->
+        <svg class="ps-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+            <path d="M10 2a6 6 0 0 0-6 6v3l-1.5 2.5h15L16 11V8a6 6 0 0 0-6-6z"/>
+            <path d="M8.5 16.5a1.5 1.5 0 0 0 3 0"/>
+        </svg>
+        <!-- Settings icon -->
+        <svg class="ps-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+            <circle cx="10" cy="10" r="2.5"/>
+            <path d="M10 3v1.5M10 15.5V17M3 10h1.5M15.5 10H17M4.9 4.9l1.1 1.1M14 14l1.1 1.1M4.9 15.1l1.1-1.1M14 6l1.1-1.1"/>
+        </svg>
+        <div id="ps-time"></div>
+    </div>
+</div>
 
-        <div class="bjj">
-            <p class="prheading">Geometry Dash</p>
-            <img src="./images/artworks-FWGrLzyxBsikSddU-BfBLYw-t1080x1080.jpg" class="grappling pictures">
-            <p>I'm addicted. Also, the simplicity and effectiveness of this game inspires me to game dev. <br>
-                <br>
-                Hours: ???
-            </p>
-        </div>
-    </section>
+<!-- Main stage -->
+<div id="ps-stage">
+    <div id="ps-info">
+        <div id="ps-title"></div>
+        <div id="ps-meta"></div>
+    </div>
+    <div id="ps-carousel-wrap">
+        <div id="ps-carousel"></div>
+    </div>
+    <div id="ps-dots"></div>
+</div>
 
+<!-- Bottom nav hints -->
+<div id="ps-hints">
+    <div class="ps-hint"><div class="ps-key">←</div><div class="ps-key">→</div>&thinsp;Navigate</div>
+    <div class="ps-hint"><div class="ps-key">Esc</div>&thinsp;Back</div>
+</div>
+
+<script>
+    /* ── DATA ─────────────────────────────────────────────── */
+    const GAMES = [
+        {
+            title:  'Sekiro: Shadows Die Twice',
+            img:    './images/sekiro-hero.jpg',
+            hours:  '112 hours played',
+            color:  '#5c0e0e',   // deep crimson ambient
+        },
+        {
+            title:  'Pokemon Black 2',
+            img:    './images/815GvAb76VL.jpg',
+            hours:  'Too many hours played',
+            color:  '#0c1a52',   // deep cobalt
+        },
+        {
+            title:  'Metal Gear Solid',
+            img:    './images/images.jpg',
+            hours:  '64 hours played',
+            color:  '#162b0e',   // deep military green
+        },
+        {
+            title:  'Geometry Dash',
+            img:    './images/artworks-FWGrLzyxBsikSddU-BfBLYw-t1080x1080.jpg',
+            hours:  '??? hours played',
+            color:  '#0c0625',   // deep indigo
+        },
+    ];
+
+    /* Card dimensions by distance from active index */
+    const CARD_SIZES = [
+        { w: 296, h: 395 },  // d=0  active
+        { w: 208, h: 277 },  // d=1  near
+        { w: 150, h: 200 },  // d=2  far
+        { w: 110, h: 147 },  // d=3+ very far
+    ];
+    const GAP        = 14;   // px gap between cards
+    const ACTIVE_OFF = 122;  // px from left edge where active card starts
+
+    /* ── STATE ────────────────────────────────────────────── */
+    let activeIdx = 0;
+    let bgLayer   = 0;   // 0 = A on top, 1 = B on top
+
+    /* ── DOM REFS ─────────────────────────────────────────── */
+    const carousel  = document.getElementById('ps-carousel');
+    const bgImgA    = document.getElementById('ps-bg-img-a');
+    const bgImgB    = document.getElementById('ps-bg-img-b');
+    const layerB    = document.getElementById('ps-bg-b');
+    const ambient   = document.getElementById('ps-ambient');
+    const titleEl   = document.getElementById('ps-title');
+    const metaEl    = document.getElementById('ps-meta');
+    const timeEl    = document.getElementById('ps-time');
+    const dotsWrap  = document.getElementById('ps-dots');
+
+    /* ── BUILD CARDS ──────────────────────────────────────── */
+    GAMES.forEach((g, i) => {
+        const card = document.createElement('div');
+        card.className = 'ps-card';
+        card.innerHTML = `
+            <img src="${g.img}" alt="${g.title}" draggable="false">
+            <div class="ps-shine"></div>`;
+        card.addEventListener('click',      () => goTo(i));
+        card.addEventListener('mousemove',  onTilt);
+        card.addEventListener('mouseleave', onUntilt);
+        carousel.appendChild(card);
+
+        // Dot
+        const dot = document.createElement('div');
+        dot.className = 'ps-dot';
+        dotsWrap.appendChild(dot);
+    });
+
+    const cards = Array.from(carousel.querySelectorAll('.ps-card'));
+    const dots  = Array.from(dotsWrap.querySelectorAll('.ps-dot'));
+
+    /* ── SIZING HELPERS ───────────────────────────────────── */
+    function distSize(dist) {
+        return CARD_SIZES[Math.min(Math.abs(dist), 3)];
+    }
+
+    /* Sum of (width + gap) for cards 0 .. activeIdx-1 using TARGET widths */
+    function carouselOffset() {
+        let offset = 0;
+        for (let i = 0; i < activeIdx; i++) {
+            offset += distSize(i - activeIdx).w + GAP;
+        }
+        return offset;
+    }
+
+    /* ── MAIN UPDATE ──────────────────────────────────────── */
+    function update() {
+        const g = GAMES[activeIdx];
+
+        /* Background crossfade */
+        if (bgLayer === 0) {
+            // A is visible; load new img into B, fade B in, then snap A and hide B
+            bgImgB.src = g.img;
+            layerB.classList.add('ps-bg-visible');
+            setTimeout(() => {
+                bgImgA.src = g.img;
+                layerB.classList.remove('ps-bg-visible');
+            }, 760);
+        } else {
+            bgImgA.src = g.img;
+            layerB.classList.remove('ps-bg-visible');
+            setTimeout(() => {
+                bgImgB.src = g.img;
+            }, 760);
+        }
+        bgLayer = 1 - bgLayer;
+
+        /* Ambient glow */
+        ambient.style.background =
+            `linear-gradient(to top, ${g.color}e0 0%, ${g.color}55 38%, transparent 100%)`;
+
+        /* Title / meta */
+        titleEl.style.opacity = '0';
+        metaEl.style.opacity  = '0';
+        setTimeout(() => {
+            titleEl.textContent   = g.title;
+            metaEl.textContent    = g.hours;
+            titleEl.style.opacity = '1';
+            metaEl.style.opacity  = '1';
+        }, 140);
+
+        /* Cards: assign size class + reset tilt */
+        cards.forEach((c, i) => {
+            const dist = i - activeIdx;
+            c.classList.remove('ps-d0', 'ps-d1', 'ps-d2', 'ps-d3');
+            c.classList.add('ps-d' + Math.min(Math.abs(dist), 3));
+            c.style.transform = '';
+            c.querySelector('img').style.transform = '';
+            c.querySelector('.ps-shine').style.cssText = '';
+        });
+
+        /* Shift carousel so active card lands at ACTIVE_OFF from left */
+        carousel.style.transform = `translateX(${ACTIVE_OFF - carouselOffset()}px)`;
+
+        /* Dots */
+        dots.forEach((d, i) => d.classList.toggle('ps-dot-active', i === activeIdx));
+    }
+
+    /* ── NAVIGATION ───────────────────────────────────────── */
+    function goTo(idx) {
+        if (idx < 0 || idx >= GAMES.length) return;
+        activeIdx = idx;
+        update();
+    }
+
+    /* ── 3D CARD TILT ─────────────────────────────────────── */
+    function onTilt(e) {
+        const card = e.currentTarget;
+        if (!card.classList.contains('ps-d0')) return;
+
+        const r   = card.getBoundingClientRect();
+        const dx  = (e.clientX - (r.left + r.width  / 2)) / (r.width  / 2); // –1 → 1
+        const dy  = (e.clientY - (r.top  + r.height / 2)) / (r.height / 2);
+        const rY  =  dx * 13;
+        const rX  = -dy *  9;
+
+        card.style.transform    = `perspective(900px) rotateX(${rX}deg) rotateY(${rY}deg) scale3d(1.035,1.035,1.035)`;
+        card.style.transition   = 'box-shadow 0.3s ease';
+
+        /* Parallax on the image */
+        const img = card.querySelector('img');
+        img.style.transform  = `translate(${dx * -9}px, ${dy * -9}px) scale(1.09)`;
+        img.style.transition = 'transform 0.08s linear';
+
+        /* Moving specular highlight */
+        const shine = card.querySelector('.ps-shine');
+        const px = ((e.clientX - r.left) / r.width  * 100).toFixed(1);
+        const py = ((e.clientY - r.top)  / r.height * 100).toFixed(1);
+        shine.style.background = `radial-gradient(circle at ${px}% ${py}%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.05) 40%, transparent 70%)`;
+        shine.style.opacity    = '1';
+    }
+
+    function onUntilt(e) {
+        const card = e.currentTarget;
+        card.style.transform  = '';
+        card.style.transition = '';
+        const img = card.querySelector('img');
+        img.style.transform  = '';
+        img.style.transition = 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)';
+        card.querySelector('.ps-shine').style.cssText = '';
+    }
+
+    /* ── KEYBOARD ─────────────────────────────────────────── */
+    document.addEventListener('keydown', e => {
+        switch (e.key) {
+            case 'ArrowRight': goTo(activeIdx + 1); e.preventDefault(); break;
+            case 'ArrowLeft':  goTo(activeIdx - 1); e.preventDefault(); break;
+            case 'Escape':     history.back();                           break;
+        }
+    });
+
+    /* ── CLOCK ────────────────────────────────────────────── */
+    function tick() {
+        const d  = new Date();
+        const hh = String(d.getHours()).padStart(2,'0');
+        const mm = String(d.getMinutes()).padStart(2,'0');
+        timeEl.textContent = `${hh}:${mm}`;
+    }
+    tick();
+    setInterval(tick, 30000);
+
+    /* ── INIT ─────────────────────────────────────────────── */
+    bgImgA.src = GAMES[0].img;
+    bgImgB.src = GAMES[0].img;
+    update();
+</script>
 </body>
-
 </html>
