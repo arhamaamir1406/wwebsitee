@@ -134,7 +134,7 @@
         }
 
         /* ── ICON ROW ───────────────────────────────────────── */
-        #ps-rowclip { width: 100%; overflow: hidden; }
+        #ps-rowclip { width: 100%; overflow: hidden; padding: 6px 0; }
         #ps-row {
             display: flex; align-items: flex-start; gap: var(--gap);
             will-change: transform;
@@ -167,8 +167,7 @@
             width: var(--tile-big); height: var(--tile-big);
             filter: brightness(1);
             box-shadow:
-                0 0 0 2px rgba(255,255,255,0.92),
-                0 0 22px rgba(255,255,255,0.18),
+                0 0 0 2px rgba(6,10,16,0.92),
                 0 22px 54px rgba(0,0,0,0.6);
         }
 
@@ -196,12 +195,10 @@
 <!-- Tabs -->
 <div id="ps-tabs">
     <div class="ps-tab active">Games</div>
-    <div class="ps-tab">Media</div>
 </div>
 
 <!-- Status -->
 <div id="ps-status">
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M13 13l4 4"/></svg>
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M10 2a5.5 5.5 0 0 0-5.5 5.5v3L3 13h14l-1.5-2.5v-3A5.5 5.5 0 0 0 10 2z"/><path d="M8 16a2 2 0 0 0 4 0"/></svg>
     <div id="ps-avatar">A</div>
     <div id="ps-time"></div>
@@ -221,10 +218,10 @@
 <script>
     /* ── DATA (games kept as-is) ──────────────────────────── */
     const GAMES = [
-        { title: 'Sekiro: Shadows Die Twice', img: './images/sekiro-hero.jpg',                                  meta: '112 hours played',        color: '#5c0e0e' },
-        { title: 'Pokémon Black 2',           img: './images/815GvAb76VL.jpg',                                   meta: 'Too many hours played',   color: '#0c1a52' },
-        { title: 'Metal Gear Solid',          img: './images/images.jpg',                                        meta: '64 hours played',         color: '#162b0e' },
-        { title: 'Geometry Dash',             img: './images/artworks-FWGrLzyxBsikSddU-BfBLYw-t1080x1080.jpg',    meta: '??? hours played',        color: '#0c0625' },
+        { title: 'Sekiro: Shadows Die Twice', img: './images/cover-sekiro.png',       meta: '112 hours played',        color: '#5c0e0e' },
+        { title: 'Pokémon Black 2',           img: './images/cover-pokemon.png',      meta: 'Too many hours played',   color: '#0c1a52' },
+        { title: 'Metal Gear Solid',          img: './images/cover-mgs.png',          meta: '64 hours played',         color: '#162b0e' },
+        { title: 'Geometry Dash',             img: './images/cover-geometrydash.png', meta: '??? hours played',        color: '#0c0625' },
     ];
 
     /* read tile geometry from CSS so the slide maths stay in sync */
@@ -246,13 +243,25 @@
 
     let activeIdx = 0;
     let bgLayer   = 0;   // 0 = A on top
+    let mouseMoved = false;  // true once the cursor physically moves
+
+    /* a real cursor move re-arms hover navigation */
+    window.addEventListener('mousemove', () => { mouseMoved = true; });
 
     /* ── BUILD TILES ──────────────────────────────────────── */
     GAMES.forEach((g, i) => {
         const tile = document.createElement('div');
         tile.className = 'ps-tile';
         tile.innerHTML = `<img src="${g.img}" alt="${g.title}" draggable="false">`;
-        tile.addEventListener('click', () => goTo(i));
+        tile.addEventListener('mouseenter', () => {
+            /* navigate only when the cursor physically moved onto this tile.
+               focusing slides the row, which drags other tiles under a still
+               cursor and fires synthetic mouseenters — those have no mousemove,
+               so they stay blocked and we don't cascade through every game. */
+            if (!mouseMoved) return;
+            mouseMoved = false;
+            goTo(i);
+        });
         row.appendChild(tile);
     });
     const tiles = Array.from(row.children);
