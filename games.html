@@ -27,7 +27,11 @@
         }
 
         /* ── BACKGROUND (double-buffered key art) ───────────── */
-        #ps-bg-a, #ps-bg-b { position: fixed; inset: 0; z-index: 0; }
+        #ps-bg-a, #ps-bg-b {
+            position: fixed; inset: 0; z-index: 0;
+            opacity: 0; transition: opacity 0.7s ease;
+        }
+        #ps-bg-a.ps-bg-visible, #ps-bg-b.ps-bg-visible { opacity: 1; }
         #ps-bg-a img, #ps-bg-b img {
             position: absolute; inset: 0;
             width: 100%; height: 100%;
@@ -39,8 +43,6 @@
             from { transform: scale(1.10); }
             to   { transform: scale(1.18); }
         }
-        #ps-bg-b { opacity: 0; transition: opacity 0.7s ease; }
-        #ps-bg-b.ps-bg-visible { opacity: 1; }
 
         /* Dark gradient + faint per-game colour wash */
         #ps-overlay {
@@ -92,6 +94,70 @@
         #ps-time {
             color: #fff; font-size: 0.92rem; font-weight: 400;
             letter-spacing: 0.02em; min-width: 64px; text-align: right;
+        }
+        #ps-bell { transition: color 0.2s ease, opacity 0.2s ease; }
+        #ps-bell:hover { opacity: 1; }
+        #ps-avatar { cursor: pointer; }
+
+        /* ── PROFILE CARD ───────────────────────────────────── */
+        #ps-profile {
+            position: fixed; top: 58px; right: 40px; z-index: 60;
+            display: flex; gap: 12px; align-items: center;
+            padding: 14px 18px 14px 14px; border-radius: 12px;
+            background: rgba(20,24,32,0.72);
+            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 18px 44px rgba(0,0,0,0.55);
+            opacity: 0; transform: translateY(-10px); pointer-events: none;
+            transition: opacity 0.28s ease, transform 0.28s ease;
+        }
+        #ps-profile.show { opacity: 1; transform: translateY(0); }
+        #ps-profile-avatar {
+            flex-shrink: 0; width: 42px; height: 42px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #4d7cff, #9b6bff);
+            font-size: 1.05rem; font-weight: 700; color: #fff;
+        }
+        #ps-profile-tag {
+            font-size: 0.96rem; font-weight: 700; color: #fff;
+            letter-spacing: -0.01em;
+        }
+        #ps-profile-sub {
+            margin-top: 3px; font-size: 0.7rem; font-weight: 600;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            color: #4ddf7c; display: flex; align-items: center; gap: 5px;
+        }
+        #ps-profile-sub::before {
+            content: ''; width: 7px; height: 7px; border-radius: 50%;
+            background: #4ddf7c;
+        }
+
+        /* ── NOTIFICATION TOAST ─────────────────────────────── */
+        #ps-notif {
+            position: fixed; top: 58px; right: 40px; z-index: 60;
+            width: 320px; display: flex; gap: 12px; align-items: flex-start;
+            padding: 14px 16px; border-radius: 12px;
+            background: rgba(20,24,32,0.72);
+            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 18px 44px rgba(0,0,0,0.55);
+            opacity: 0; transform: translateY(-10px); pointer-events: none;
+            transition: opacity 0.28s ease, transform 0.28s ease;
+        }
+        #ps-notif.show { opacity: 1; transform: translateY(0); }
+        #ps-notif-icon {
+            flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #4d7cff, #9b6bff);
+        }
+        #ps-notif-icon svg { width: 17px; height: 17px; color: #fff; }
+        #ps-notif-title {
+            font-size: 0.66rem; font-weight: 700; letter-spacing: 0.12em;
+            text-transform: uppercase; color: rgba(255,255,255,0.5);
+            margin-bottom: 5px;
+        }
+        #ps-notif-text {
+            font-size: 0.86rem; font-weight: 500; color: #fff; line-height: 1.4;
         }
 
         /* ── BACK (subtle — PS5 home has none, web needs one) ── */
@@ -175,6 +241,7 @@
         @media (max-width: 760px) {
             :root { --tile-small: 84px; --tile-big: 150px; --gap: 12px; --anchor: 40px; }
             #ps-status { right: 20px; }
+            #ps-notif { right: 20px; left: 20px; width: auto; }
         }
     </style>
 </head>
@@ -199,9 +266,29 @@
 
 <!-- Status -->
 <div id="ps-status">
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M10 2a5.5 5.5 0 0 0-5.5 5.5v3L3 13h14l-1.5-2.5v-3A5.5 5.5 0 0 0 10 2z"/><path d="M8 16a2 2 0 0 0 4 0"/></svg>
-    <div id="ps-avatar">A</div>
+    <svg id="ps-bell" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M10 2a5.5 5.5 0 0 0-5.5 5.5v3L3 13h14l-1.5-2.5v-3A5.5 5.5 0 0 0 10 2z"/><path d="M8 16a2 2 0 0 0 4 0"/></svg>
+    <div id="ps-avatar" title="curiouschiro">C</div>
     <div id="ps-time"></div>
+</div>
+
+<!-- Profile card -->
+<div id="ps-profile">
+    <div id="ps-profile-avatar">C</div>
+    <div id="ps-profile-body">
+        <div id="ps-profile-tag">curiouschiro</div>
+        <div id="ps-profile-sub">Online</div>
+    </div>
+</div>
+
+<!-- Notification toast -->
+<div id="ps-notif">
+    <div id="ps-notif-icon">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M10 2a5.5 5.5 0 0 0-5.5 5.5v3L3 13h14l-1.5-2.5v-3A5.5 5.5 0 0 0 10 2z"/><path d="M8 16a2 2 0 0 0 4 0"/></svg>
+    </div>
+    <div id="ps-notif-body">
+        <div id="ps-notif-title">Notifications</div>
+        <div id="ps-notif-text">I just finished Detroit: Become Human. I am now playing Bloodborne.</div>
+    </div>
 </div>
 
 <!-- Stage -->
@@ -235,15 +322,45 @@
     const row     = document.getElementById('ps-row');
     const bgImgA  = document.getElementById('ps-bg-img-a');
     const bgImgB  = document.getElementById('ps-bg-img-b');
+    const layerA  = document.getElementById('ps-bg-a');
     const layerB  = document.getElementById('ps-bg-b');
     const ambient = document.getElementById('ps-ambient');
     const titleEl = document.getElementById('ps-title');
     const metaEl  = document.getElementById('ps-meta');
     const timeEl  = document.getElementById('ps-time');
 
+    /* ── NOTIFICATION TOAST + PROFILE CARD ────────────────── */
+    const bell    = document.getElementById('ps-bell');
+    const notif   = document.getElementById('ps-notif');
+    const avatar  = document.getElementById('ps-avatar');
+    const profile = document.getElementById('ps-profile');
+    let notifTimer = null;
+
+    bell.addEventListener('click', (e) => {
+        e.stopPropagation();
+        profile.classList.remove('show');
+        const showing = notif.classList.toggle('show');
+        clearTimeout(notifTimer);
+        if (showing) notifTimer = setTimeout(() => notif.classList.remove('show'), 6000);
+    });
+
+    avatar.addEventListener('click', (e) => {
+        e.stopPropagation();
+        notif.classList.remove('show');
+        profile.classList.toggle('show');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!notif.contains(e.target) && e.target !== bell) notif.classList.remove('show');
+        if (!profile.contains(e.target) && e.target !== avatar) profile.classList.remove('show');
+    });
+
     let activeIdx = 0;
-    let bgLayer   = 0;   // 0 = A on top
+    let bgFront   = 0;   // 0 = layer A currently visible, 1 = layer B
     let mouseMoved = false;  // true once the cursor physically moves
+
+    /* preload every cover so each crossfade is instant + smooth */
+    GAMES.forEach(g => { const im = new Image(); im.src = g.img; });
 
     /* a real cursor move re-arms hover navigation */
     window.addEventListener('mousemove', () => { mouseMoved = true; });
@@ -277,17 +394,16 @@
            tiles before the focus are all SMALL, so the offset is exact. */
         row.style.transform = `translateX(${ANCHOR - activeIdx * STEP}px)`;
 
-        /* background crossfade */
-        if (bgLayer === 0) {
-            bgImgB.src = g.img;
-            layerB.classList.add('ps-bg-visible');
-            setTimeout(() => { bgImgA.src = g.img; layerB.classList.remove('ps-bg-visible'); }, 720);
-        } else {
-            bgImgA.src = g.img;
-            layerB.classList.remove('ps-bg-visible');
-            setTimeout(() => { bgImgB.src = g.img; }, 720);
-        }
-        bgLayer = 1 - bgLayer;
+        /* background crossfade — write the new art onto the hidden layer,
+           then swap which layer is visible. no timers, so rapid hovering
+           can never strand a stale image on screen. */
+        const back    = bgFront === 0 ? layerB : layerA;
+        const backImg = bgFront === 0 ? bgImgB : bgImgA;
+        const front   = bgFront === 0 ? layerA : layerB;
+        backImg.src = g.img;
+        back.classList.add('ps-bg-visible');
+        front.classList.remove('ps-bg-visible');
+        bgFront = 1 - bgFront;
 
         /* faint colour wash from the art */
         ambient.style.background =
@@ -342,6 +458,7 @@
     /* ── INIT ─────────────────────────────────────────────── */
     bgImgA.src = GAMES[0].img;
     bgImgB.src = GAMES[0].img;
+    layerA.classList.add('ps-bg-visible');
     update();
 </script>
 </body>
