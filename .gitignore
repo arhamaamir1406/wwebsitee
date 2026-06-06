@@ -8,3 +8,6 @@ Thumbs.db
 # Environment / secrets
 .env
 *.env
+
+# Local media tooling (ffmpeg, scratch clips used to build the title-screen loops)
+.tools/

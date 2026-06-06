@@ -1,180 +1,360 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Games I Appreciate</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <style>
         :root {
-            --ease: cubic-bezier(0.22, 1, 0.36, 1);   /* used for BOTH tile resize and row slide
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
+            /* used for BOTH tile resize and row slide
                                                           so the focused tile stays anchored */
             --tile-small: 120px;
-            --tile-big:   212px;
-            --gap:        16px;
-            --anchor:     86px;   /* fixed left margin of the focused tile */
+            --tile-big: 212px;
+            --gap: 16px;
+            --anchor: 86px;
+            /* fixed left margin of the focused tile */
         }
 
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-        html, body {
-            width: 100%; height: 100%;
+        html,
+        body {
+            width: 100%;
+            height: 100%;
             background: #060a10;
             overflow: hidden;
             font-family: 'Inter', 'SST', 'SF Pro Display', 'Helvetica Neue', sans-serif;
-            user-select: none; -webkit-user-select: none;
+            user-select: none;
+            -webkit-user-select: none;
             -webkit-font-smoothing: antialiased;
         }
 
         /* ── BACKGROUND (double-buffered key art) ───────────── */
-        #ps-bg-a, #ps-bg-b {
-            position: fixed; inset: 0; z-index: 0;
-            opacity: 0; transition: opacity 0.7s ease;
+        #ps-bg-a,
+        #ps-bg-b {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 0.7s ease;
         }
-        #ps-bg-a.ps-bg-visible, #ps-bg-b.ps-bg-visible { opacity: 1; }
-        #ps-bg-a img, #ps-bg-b img {
-            position: absolute; inset: 0;
-            width: 100%; height: 100%;
+
+        #ps-bg-a.ps-bg-visible,
+        #ps-bg-b.ps-bg-visible {
+            opacity: 1;
+        }
+
+        #ps-bg-a img,
+        #ps-bg-b img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
             filter: blur(22px) brightness(0.46) saturate(1.15);
-            animation: psZoom 22s ease-in-out infinite alternate; /* gentle ken-burns */
+            animation: psZoom 22s ease-in-out infinite alternate;
+            /* gentle ken-burns */
         }
+
         @keyframes psZoom {
-            from { transform: scale(1.10); }
-            to   { transform: scale(1.18); }
+            from {
+                transform: scale(1.10);
+            }
+
+            to {
+                transform: scale(1.18);
+            }
         }
 
         /* Dark gradient + faint per-game colour wash */
         #ps-overlay {
-            position: fixed; inset: 0; z-index: 1; pointer-events: none;
-            background: linear-gradient(
-                180deg,
-                rgba(4,7,12,0.55) 0%,
-                rgba(4,7,12,0.10) 26%,
-                rgba(4,7,12,0.05) 52%,
-                rgba(4,7,12,0.55) 82%,
-                rgba(4,7,12,0.92) 100%);
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background: linear-gradient(180deg,
+                    rgba(4, 7, 12, 0.55) 0%,
+                    rgba(4, 7, 12, 0.10) 26%,
+                    rgba(4, 7, 12, 0.05) 52%,
+                    rgba(4, 7, 12, 0.55) 82%,
+                    rgba(4, 7, 12, 0.92) 100%);
         }
+
         #ps-ambient {
-            position: fixed; bottom: 0; left: 0; right: 0; z-index: 2;
-            height: 50%; pointer-events: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 2;
+            height: 50%;
+            pointer-events: none;
             opacity: 0.55;
             transition: background 1s ease;
         }
 
         /* ── TOP TABS  (Games | Media) ──────────────────────── */
         #ps-tabs {
-            position: fixed; top: 22px; left: 50%; transform: translateX(-50%);
-            z-index: 50; display: flex; gap: 34px;
+            position: fixed;
+            top: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
+            display: flex;
+            gap: 34px;
         }
+
         .ps-tab {
-            font-size: 0.96rem; font-weight: 600; letter-spacing: 0.01em;
-            color: rgba(255,255,255,0.4);
-            cursor: pointer; transition: color 0.2s ease;
-            position: relative; padding-bottom: 4px;
+            font-size: 0.96rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: color 0.2s ease;
+            position: relative;
+            padding-bottom: 4px;
         }
-        .ps-tab.active { color: #fff; }
+
+        .ps-tab.active {
+            color: #fff;
+        }
+
         .ps-tab.active::after {
-            content: ''; position: absolute; left: 0; right: 0; bottom: -2px;
-            height: 2px; border-radius: 2px; background: #fff;
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -2px;
+            height: 2px;
+            border-radius: 2px;
+            background: #fff;
         }
 
         /* ── STATUS (top-right) ─────────────────────────────── */
         #ps-status {
-            position: fixed; top: 18px; right: 40px; z-index: 50;
-            display: flex; align-items: center; gap: 20px;
+            position: fixed;
+            top: 18px;
+            right: 40px;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
-        #ps-status svg { width: 19px; height: 19px; color: #fff; opacity: 0.85; cursor: pointer; }
+
+        #ps-status svg {
+            width: 19px;
+            height: 19px;
+            color: #fff;
+            opacity: 0.85;
+            cursor: pointer;
+        }
+
         #ps-avatar {
-            width: 28px; height: 28px; border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
             background: linear-gradient(135deg, #4d7cff, #9b6bff);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.74rem; font-weight: 700; color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: #fff;
         }
+
         #ps-time {
-            color: #fff; font-size: 0.92rem; font-weight: 400;
-            letter-spacing: 0.02em; min-width: 64px; text-align: right;
+            color: #fff;
+            font-size: 0.92rem;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            min-width: 64px;
+            text-align: right;
         }
-        #ps-bell { transition: color 0.2s ease, opacity 0.2s ease; }
-        #ps-bell:hover { opacity: 1; }
-        #ps-avatar { cursor: pointer; }
+
+        #ps-bell {
+            transition: color 0.2s ease, opacity 0.2s ease;
+        }
+
+        #ps-bell:hover {
+            opacity: 1;
+        }
+
+        #ps-avatar {
+            cursor: pointer;
+        }
 
         /* ── PROFILE CARD ───────────────────────────────────── */
         #ps-profile {
-            position: fixed; top: 58px; right: 40px; z-index: 60;
-            display: flex; gap: 12px; align-items: center;
-            padding: 14px 18px 14px 14px; border-radius: 12px;
-            background: rgba(20,24,32,0.72);
-            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: 0 18px 44px rgba(0,0,0,0.55);
-            opacity: 0; transform: translateY(-10px); pointer-events: none;
+            position: fixed;
+            top: 58px;
+            right: 40px;
+            z-index: 60;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 14px 18px 14px 14px;
+            border-radius: 12px;
+            background: rgba(20, 24, 32, 0.72);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
             transition: opacity 0.28s ease, transform 0.28s ease;
         }
-        #ps-profile.show { opacity: 1; transform: translateY(0); }
-        #ps-profile-avatar {
-            flex-shrink: 0; width: 42px; height: 42px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            background: linear-gradient(135deg, #4d7cff, #9b6bff);
-            font-size: 1.05rem; font-weight: 700; color: #fff;
+
+        #ps-profile.show {
+            opacity: 1;
+            transform: translateY(0);
         }
+
+        #ps-profile-avatar {
+            flex-shrink: 0;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #4d7cff, #9b6bff);
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
         #ps-profile-tag {
-            font-size: 0.96rem; font-weight: 700; color: #fff;
+            font-size: 0.96rem;
+            font-weight: 700;
+            color: #fff;
             letter-spacing: -0.01em;
         }
+
         #ps-profile-sub {
-            margin-top: 3px; font-size: 0.7rem; font-weight: 600;
-            letter-spacing: 0.1em; text-transform: uppercase;
-            color: #4ddf7c; display: flex; align-items: center; gap: 5px;
+            margin-top: 3px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #4ddf7c;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
+
         #ps-profile-sub::before {
-            content: ''; width: 7px; height: 7px; border-radius: 50%;
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
             background: #4ddf7c;
         }
 
         /* ── NOTIFICATION TOAST ─────────────────────────────── */
         #ps-notif {
-            position: fixed; top: 58px; right: 40px; z-index: 60;
-            width: 320px; display: flex; gap: 12px; align-items: flex-start;
-            padding: 14px 16px; border-radius: 12px;
-            background: rgba(20,24,32,0.72);
-            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: 0 18px 44px rgba(0,0,0,0.55);
-            opacity: 0; transform: translateY(-10px); pointer-events: none;
+            position: fixed;
+            top: 58px;
+            right: 40px;
+            z-index: 60;
+            width: 320px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: rgba(20, 24, 32, 0.72);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55);
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
             transition: opacity 0.28s ease, transform 0.28s ease;
         }
-        #ps-notif.show { opacity: 1; transform: translateY(0); }
+
+        #ps-notif.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         #ps-notif-icon {
-            flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background: linear-gradient(135deg, #4d7cff, #9b6bff);
         }
-        #ps-notif-icon svg { width: 17px; height: 17px; color: #fff; }
+
+        #ps-notif-icon svg {
+            width: 17px;
+            height: 17px;
+            color: #fff;
+        }
+
         #ps-notif-title {
-            font-size: 0.66rem; font-weight: 700; letter-spacing: 0.12em;
-            text-transform: uppercase; color: rgba(255,255,255,0.5);
+            font-size: 0.66rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.5);
             margin-bottom: 5px;
         }
+
         #ps-notif-text {
-            font-size: 0.86rem; font-weight: 500; color: #fff; line-height: 1.4;
+            font-size: 0.86rem;
+            font-weight: 500;
+            color: #fff;
+            line-height: 1.4;
         }
 
         /* ── BACK (subtle — PS5 home has none, web needs one) ── */
         #ps-back {
-            position: fixed; top: 18px; left: 28px; z-index: 50;
-            display: flex; align-items: center; gap: 6px;
-            color: rgba(255,255,255,0.35); text-decoration: none;
-            font-size: 0.78rem; font-weight: 500; letter-spacing: 0.04em;
+            position: fixed;
+            top: 18px;
+            left: 28px;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255, 255, 255, 0.35);
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 0.04em;
             transition: color 0.2s ease;
         }
-        #ps-back:hover { color: rgba(255,255,255,0.9); }
-        #ps-back svg { width: 16px; height: 16px; }
+
+        #ps-back:hover {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        #ps-back svg {
+            width: 16px;
+            height: 16px;
+        }
 
         /* ── STAGE (vertically centred, nudged up) ──────────── */
         #ps-stage {
-            position: fixed; inset: 0; z-index: 10;
-            display: flex; flex-direction: column; justify-content: center;
+            position: fixed;
+            inset: 0;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             padding-top: 30px;
         }
 
@@ -182,284 +362,456 @@
             padding-left: var(--anchor);
             margin-bottom: 26px;
             height: 92px;
-            display: flex; flex-direction: column; justify-content: flex-end;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
         }
+
         #ps-title {
             font-size: clamp(1.6rem, 2.6vw, 2.6rem);
-            font-weight: 800; color: #fff;
-            letter-spacing: -0.022em; line-height: 1.04;
-            text-shadow: 0 2px 26px rgba(0,0,0,0.85);
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.022em;
+            line-height: 1.04;
+            text-shadow: 0 2px 26px rgba(0, 0, 0, 0.85);
             transition: opacity 0.22s ease;
         }
+
         #ps-meta {
             margin-top: 8px;
-            font-size: 0.72rem; font-weight: 600;
-            color: rgba(255,255,255,0.55);
-            letter-spacing: 0.14em; text-transform: uppercase;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.55);
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
             transition: opacity 0.22s ease;
         }
 
         /* ── ICON ROW ───────────────────────────────────────── */
-        #ps-rowclip { width: 100%; overflow: hidden; padding: 6px 0; }
+        #ps-rowclip {
+            width: 100%;
+            overflow: hidden;
+            padding: 6px 0;
+        }
+
         #ps-row {
-            display: flex; align-items: flex-start; gap: var(--gap);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--gap);
             will-change: transform;
             transition: transform 0.46s var(--ease);
         }
 
         .ps-tile {
             flex-shrink: 0;
-            width: var(--tile-small); height: var(--tile-small);
-            border-radius: 14px; overflow: hidden;
-            position: relative; cursor: pointer;
+            width: var(--tile-small);
+            height: var(--tile-small);
+            border-radius: 14px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
             background: #11151c;
             filter: brightness(0.74);
             transition:
-                width   0.46s var(--ease),
-                height  0.46s var(--ease),
-                filter  0.3s ease,
+                width 0.46s var(--ease),
+                height 0.46s var(--ease),
+                filter 0.3s ease,
                 transform 0.25s ease,
                 box-shadow 0.3s ease;
         }
+
         .ps-tile img {
-            width: 100%; height: 100%;
-            object-fit: cover; display: block; pointer-events: none;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            pointer-events: none;
         }
+
         .ps-tile:not(.active):hover {
             filter: brightness(0.95);
             transform: translateY(-5px);
         }
+
         .ps-tile.active {
-            width: var(--tile-big); height: var(--tile-big);
+            width: var(--tile-big);
+            height: var(--tile-big);
             filter: brightness(1);
             box-shadow:
-                0 0 0 2px rgba(6,10,16,0.92),
-                0 22px 54px rgba(0,0,0,0.6);
+                0 0 0 2px rgba(6, 10, 16, 0.92),
+                0 22px 54px rgba(0, 0, 0, 0.6);
+        }
+
+        /* ── LAUNCH (looping title-screen player) ───────────── */
+        #ps-launch {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.45s ease;
+        }
+
+        #ps-launch.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #ps-launch-frame {
+            width: 100%;
+            height: 100%;
+        }
+
+        #ps-launch-frame video {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: contain;
+            background: #000;
+        }
+
+        #ps-launch-label {
+            position: fixed;
+            top: 26px;
+            left: 32px;
+            z-index: 210;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            text-shadow: 0 2px 14px rgba(0, 0, 0, 0.8);
+            pointer-events: none;
+        }
+
+        #ps-launch-close {
+            position: fixed;
+            top: 22px;
+            right: 26px;
+            z-index: 210;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(20, 24, 32, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #fff;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        #ps-launch-close:hover {
+            opacity: 1;
+            transform: scale(1.08);
+        }
+
+        #ps-launch-close svg {
+            width: 18px;
+            height: 18px;
         }
 
         /* ── RESPONSIVE ─────────────────────────────────────── */
         @media (max-width: 760px) {
-            :root { --tile-small: 84px; --tile-big: 150px; --gap: 12px; --anchor: 40px; }
-            #ps-status { right: 20px; }
-            #ps-notif { right: 20px; left: 20px; width: auto; }
+            :root {
+                --tile-small: 84px;
+                --tile-big: 150px;
+                --gap: 12px;
+                --anchor: 40px;
+            }
+
+            #ps-status {
+                right: 20px;
+            }
+
+            #ps-notif {
+                right: 20px;
+                left: 20px;
+                width: auto;
+            }
         }
     </style>
 </head>
+
 <body>
 
-<!-- Background -->
-<div id="ps-bg-a"><img id="ps-bg-img-a" src="" alt=""></div>
-<div id="ps-bg-b"><img id="ps-bg-img-b" src="" alt=""></div>
-<div id="ps-overlay"></div>
-<div id="ps-ambient"></div>
+    <!-- Background -->
+    <div id="ps-bg-a"><img id="ps-bg-img-a" src="" alt=""></div>
+    <div id="ps-bg-b"><img id="ps-bg-img-b" src="" alt=""></div>
+    <div id="ps-overlay"></div>
+    <div id="ps-ambient"></div>
 
-<!-- Subtle back -->
-<a id="ps-back" href="./index.html">
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>
-    Back
-</a>
+    <!-- Subtle back -->
+    <a id="ps-back" href="./index.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M10 3L5 8l5 5" />
+        </svg>
+        Back
+    </a>
 
-<!-- Tabs -->
-<div id="ps-tabs">
-    <div class="ps-tab active">Games</div>
-</div>
-
-<!-- Status -->
-<div id="ps-status">
-    <svg id="ps-bell" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M10 2a5.5 5.5 0 0 0-5.5 5.5v3L3 13h14l-1.5-2.5v-3A5.5 5.5 0 0 0 10 2z"/><path d="M8 16a2 2 0 0 0 4 0"/></svg>
-    <div id="ps-avatar" title="curiouschiro">C</div>
-    <div id="ps-time"></div>
-</div>
-
-<!-- Profile card -->
-<div id="ps-profile">
-    <div id="ps-profile-avatar">C</div>
-    <div id="ps-profile-body">
-        <div id="ps-profile-tag">curiouschiro</div>
-        <div id="ps-profile-sub">Online</div>
+    <!-- Tabs -->
+    <div id="ps-tabs">
+        <div class="ps-tab active">Games</div>
     </div>
-</div>
 
-<!-- Notification toast -->
-<div id="ps-notif">
-    <div id="ps-notif-icon">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M10 2a5.5 5.5 0 0 0-5.5 5.5v3L3 13h14l-1.5-2.5v-3A5.5 5.5 0 0 0 10 2z"/><path d="M8 16a2 2 0 0 0 4 0"/></svg>
+    <!-- Status -->
+    <div id="ps-status">
+        <svg id="ps-bell" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"
+            stroke-linecap="round">
+            <path d="M10 2a5.5 5.5 0 0 0-5.5 5.5v3L3 13h14l-1.5-2.5v-3A5.5 5.5 0 0 0 10 2z" />
+            <path d="M8 16a2 2 0 0 0 4 0" />
+        </svg>
+        <div id="ps-avatar" title="curiouschiro">C</div>
+        <div id="ps-time"></div>
     </div>
-    <div id="ps-notif-body">
-        <div id="ps-notif-title">Notifications</div>
-        <div id="ps-notif-text">I just finished Detroit: Become Human. I am now playing Bloodborne.</div>
+
+    <!-- Profile card -->
+    <div id="ps-profile">
+        <div id="ps-profile-avatar">C</div>
+        <div id="ps-profile-body">
+            <div id="ps-profile-tag">curiouschiro</div>
+            <div id="ps-profile-sub">Online</div>
+        </div>
     </div>
-</div>
 
-<!-- Stage -->
-<div id="ps-stage">
-    <div id="ps-info">
-        <div id="ps-title"></div>
-        <div id="ps-meta"></div>
+    <!-- Notification toast -->
+    <div id="ps-notif">
+        <div id="ps-notif-icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+                <path d="M10 2a5.5 5.5 0 0 0-5.5 5.5v3L3 13h14l-1.5-2.5v-3A5.5 5.5 0 0 0 10 2z" />
+                <path d="M8 16a2 2 0 0 0 4 0" />
+            </svg>
+        </div>
+        <div id="ps-notif-body">
+            <div id="ps-notif-title">Notifications</div>
+            <div id="ps-notif-text">I just finished Detroit: Become Human. I am now playing Bloodborne.</div>
+        </div>
     </div>
-    <div id="ps-rowclip">
-        <div id="ps-row"></div>
+
+    <!-- Launch: looping title screen -->
+    <div id="ps-launch">
+        <div id="ps-launch-label"></div>
+        <div id="ps-launch-close" title="Close (Esc)">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M5 5l10 10M15 5L5 15" />
+            </svg>
+        </div>
+        <div id="ps-launch-frame"></div>
     </div>
-</div>
 
-<script>
-    /* ── DATA (games kept as-is) ──────────────────────────── */
-    const GAMES = [
-        { title: 'Sekiro: Shadows Die Twice', img: './images/cover-sekiro.png',       meta: '112 hours played',        color: '#5c0e0e' },
-        { title: 'Pokémon Black 2',           img: './images/cover-pokemon.png',      meta: 'Too many hours played',   color: '#0c1a52' },
-        { title: 'Metal Gear Solid',          img: './images/cover-mgs.png',          meta: '64 hours played',         color: '#162b0e' },
-        { title: 'Geometry Dash',             img: './images/cover-geometrydash.png', meta: '??? hours played',        color: '#0c0625' },
-    ];
+    <!-- Stage -->
+    <div id="ps-stage">
+        <div id="ps-info">
+            <div id="ps-title"></div>
+            <div id="ps-meta"></div>
+        </div>
+        <div id="ps-rowclip">
+            <div id="ps-row"></div>
+        </div>
+    </div>
 
-    /* read tile geometry from CSS so the slide maths stay in sync */
-    const cs       = getComputedStyle(document.documentElement);
-    const SMALL    = parseInt(cs.getPropertyValue('--tile-small'));
-    const GAP      = parseInt(cs.getPropertyValue('--gap'));
-    const ANCHOR   = parseInt(cs.getPropertyValue('--anchor'));
-    const STEP     = SMALL + GAP;   // every tile to the left of the focus is SMALL wide
+    <script>
+        /* ── DATA (games kept as-is) ──────────────────────────── */
+        const GAMES = [
+            { title: 'Sekiro: Shadows Die Twice', img: './images/cover-sekiro.png', meta: '112 hours played', color: '#5c0e0e', video: './images/open-sekiro.mp4' },
+            { title: 'Pokémon Black 2', img: './images/cover-pokemon.png', meta: 'Too many hours played', color: '#0c1a52', video: './images/open-pokemon.mp4' },
+            { title: 'Metal Gear Solid', img: './images/cover-mgs.png', meta: '64 hours played', color: '#162b0e', video: './images/open-mgs.mp4' },
+            { title: 'Geometry Dash', img: './images/cover-geometrydash.png', meta: '??? hours played', color: '#0c0625', video: './images/open-geometrydash.mp4' },
+        ];
 
-    /* ── REFS ─────────────────────────────────────────────── */
-    const row     = document.getElementById('ps-row');
-    const bgImgA  = document.getElementById('ps-bg-img-a');
-    const bgImgB  = document.getElementById('ps-bg-img-b');
-    const layerA  = document.getElementById('ps-bg-a');
-    const layerB  = document.getElementById('ps-bg-b');
-    const ambient = document.getElementById('ps-ambient');
-    const titleEl = document.getElementById('ps-title');
-    const metaEl  = document.getElementById('ps-meta');
-    const timeEl  = document.getElementById('ps-time');
+        /* read tile geometry from CSS so the slide maths stay in sync */
+        const cs = getComputedStyle(document.documentElement);
+        const SMALL = parseInt(cs.getPropertyValue('--tile-small'));
+        const GAP = parseInt(cs.getPropertyValue('--gap'));
+        const ANCHOR = parseInt(cs.getPropertyValue('--anchor'));
+        const STEP = SMALL + GAP;   // every tile to the left of the focus is SMALL wide
 
-    /* ── NOTIFICATION TOAST + PROFILE CARD ────────────────── */
-    const bell    = document.getElementById('ps-bell');
-    const notif   = document.getElementById('ps-notif');
-    const avatar  = document.getElementById('ps-avatar');
-    const profile = document.getElementById('ps-profile');
-    let notifTimer = null;
+        /* ── REFS ─────────────────────────────────────────────── */
+        const row = document.getElementById('ps-row');
+        const bgImgA = document.getElementById('ps-bg-img-a');
+        const bgImgB = document.getElementById('ps-bg-img-b');
+        const layerA = document.getElementById('ps-bg-a');
+        const layerB = document.getElementById('ps-bg-b');
+        const ambient = document.getElementById('ps-ambient');
+        const titleEl = document.getElementById('ps-title');
+        const metaEl = document.getElementById('ps-meta');
+        const timeEl = document.getElementById('ps-time');
 
-    bell.addEventListener('click', (e) => {
-        e.stopPropagation();
-        profile.classList.remove('show');
-        const showing = notif.classList.toggle('show');
-        clearTimeout(notifTimer);
-        if (showing) notifTimer = setTimeout(() => notif.classList.remove('show'), 6000);
-    });
+        /* ── NOTIFICATION TOAST + PROFILE CARD ────────────────── */
+        const bell = document.getElementById('ps-bell');
+        const notif = document.getElementById('ps-notif');
+        const avatar = document.getElementById('ps-avatar');
+        const profile = document.getElementById('ps-profile');
+        let notifTimer = null;
 
-    avatar.addEventListener('click', (e) => {
-        e.stopPropagation();
-        notif.classList.remove('show');
-        profile.classList.toggle('show');
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!notif.contains(e.target) && e.target !== bell) notif.classList.remove('show');
-        if (!profile.contains(e.target) && e.target !== avatar) profile.classList.remove('show');
-    });
-
-    let activeIdx = 0;
-    let bgFront   = 0;   // 0 = layer A currently visible, 1 = layer B
-    let mouseMoved = false;  // true once the cursor physically moves
-
-    /* preload every cover so each crossfade is instant + smooth */
-    GAMES.forEach(g => { const im = new Image(); im.src = g.img; });
-
-    /* a real cursor move re-arms hover navigation */
-    window.addEventListener('mousemove', () => { mouseMoved = true; });
-
-    /* ── BUILD TILES ──────────────────────────────────────── */
-    GAMES.forEach((g, i) => {
-        const tile = document.createElement('div');
-        tile.className = 'ps-tile';
-        tile.innerHTML = `<img src="${g.img}" alt="${g.title}" draggable="false">`;
-        tile.addEventListener('mouseenter', () => {
-            /* navigate only when the cursor physically moved onto this tile.
-               focusing slides the row, which drags other tiles under a still
-               cursor and fires synthetic mouseenters — those have no mousemove,
-               so they stay blocked and we don't cascade through every game. */
-            if (!mouseMoved) return;
-            mouseMoved = false;
-            goTo(i);
+        bell.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profile.classList.remove('show');
+            const showing = notif.classList.toggle('show');
+            clearTimeout(notifTimer);
+            if (showing) notifTimer = setTimeout(() => notif.classList.remove('show'), 6000);
         });
-        row.appendChild(tile);
-    });
-    const tiles = Array.from(row.children);
 
-    /* ── UPDATE ───────────────────────────────────────────── */
-    function update() {
-        const g = GAMES[activeIdx];
+        avatar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            notif.classList.remove('show');
+            profile.classList.toggle('show');
+        });
 
-        /* focused tile = big, every other = small */
-        tiles.forEach((t, i) => t.classList.toggle('active', i === activeIdx));
+        document.addEventListener('click', (e) => {
+            if (!notif.contains(e.target) && e.target !== bell) notif.classList.remove('show');
+            if (!profile.contains(e.target) && e.target !== avatar) profile.classList.remove('show');
+        });
 
-        /* slide row so the focused tile's left edge sits at ANCHOR.
-           tiles before the focus are all SMALL, so the offset is exact. */
-        row.style.transform = `translateX(${ANCHOR - activeIdx * STEP}px)`;
+        let activeIdx = 0;
+        let bgFront = 0;   // 0 = layer A currently visible, 1 = layer B
+        let mouseMoved = false;  // true once the cursor physically moves
 
-        /* background crossfade — write the new art onto the hidden layer,
-           then swap which layer is visible. no timers, so rapid hovering
-           can never strand a stale image on screen. */
-        const back    = bgFront === 0 ? layerB : layerA;
-        const backImg = bgFront === 0 ? bgImgB : bgImgA;
-        const front   = bgFront === 0 ? layerA : layerB;
-        backImg.src = g.img;
-        back.classList.add('ps-bg-visible');
-        front.classList.remove('ps-bg-visible');
-        bgFront = 1 - bgFront;
+        /* preload every cover so each crossfade is instant + smooth */
+        GAMES.forEach(g => { const im = new Image(); im.src = g.img; });
 
-        /* faint colour wash from the art */
-        ambient.style.background =
-            `radial-gradient(120% 90% at 24% 100%, ${g.color}cc 0%, ${g.color}33 42%, transparent 72%)`;
+        /* a real cursor move re-arms hover navigation */
+        window.addEventListener('mousemove', () => { mouseMoved = true; });
 
-        /* title swap with a quick fade */
-        titleEl.style.opacity = '0';
-        metaEl.style.opacity  = '0';
-        setTimeout(() => {
-            titleEl.textContent = g.title;
-            metaEl.textContent  = g.meta;
-            titleEl.style.opacity = '1';
-            metaEl.style.opacity  = '1';
-        }, 130);
-    }
+        /* ── BUILD TILES ──────────────────────────────────────── */
+        GAMES.forEach((g, i) => {
+            const tile = document.createElement('div');
+            tile.className = 'ps-tile';
+            tile.innerHTML = `<img src="${g.img}" alt="${g.title}" draggable="false">`;
+            tile.addEventListener('mouseenter', () => {
+                /* navigate only when the cursor physically moved onto this tile.
+                   focusing slides the row, which drags other tiles under a still
+                   cursor and fires synthetic mouseenters — those have no mousemove,
+                   so they stay blocked and we don't cascade through every game. */
+                if (!mouseMoved) return;
+                mouseMoved = false;
+                goTo(i);
+            });
+            /* click/tap a game → focus it, then open its looping title screen */
+            tile.addEventListener('click', () => { goTo(i); openLaunch(i); });
+            row.appendChild(tile);
+        });
+        const tiles = Array.from(row.children);
 
-    function goTo(idx) {
-        idx = Math.max(0, Math.min(GAMES.length - 1, idx));
-        if (idx === activeIdx) return;
-        activeIdx = idx;
+        /* ── LAUNCH (looping title-screen player) ─────────────── */
+        const launch = document.getElementById('ps-launch');
+        const launchFrame = document.getElementById('ps-launch-frame');
+        const launchLabel = document.getElementById('ps-launch-label');
+        const launchClose = document.getElementById('ps-launch-close');
+
+        function openLaunch(i) {
+            const g = GAMES[i];
+            if (!g.video) return;
+            launchLabel.textContent = g.title;
+            /* locally hosted looping clip — plays inline, no YouTube redirect.
+               built inside the click so the user gesture lets the audio play. */
+            launchFrame.innerHTML =
+                `<video src="${g.video}" loop playsinline preload="auto"></video>`;
+            const v = launchFrame.querySelector('video');
+            v.play().catch(() => { v.muted = true; v.play(); });  // fall back to muted if blocked
+            launch.classList.add('show');
+        }
+        function closeLaunch() {
+            launch.classList.remove('show');
+            launchFrame.innerHTML = '';   // tear down the video so the audio stops
+        }
+        launchClose.addEventListener('click', closeLaunch);
+        launch.addEventListener('click', e => { if (e.target === launch) closeLaunch(); });
+
+        /* ── UPDATE ───────────────────────────────────────────── */
+        function update() {
+            const g = GAMES[activeIdx];
+
+            /* focused tile = big, every other = small */
+            tiles.forEach((t, i) => t.classList.toggle('active', i === activeIdx));
+
+            /* slide row so the focused tile's left edge sits at ANCHOR.
+               tiles before the focus are all SMALL, so the offset is exact. */
+            row.style.transform = `translateX(${ANCHOR - activeIdx * STEP}px)`;
+
+            /* background crossfade — write the new art onto the hidden layer,
+               then swap which layer is visible. no timers, so rapid hovering
+               can never strand a stale image on screen. */
+            const back = bgFront === 0 ? layerB : layerA;
+            const backImg = bgFront === 0 ? bgImgB : bgImgA;
+            const front = bgFront === 0 ? layerA : layerB;
+            backImg.src = g.img;
+            back.classList.add('ps-bg-visible');
+            front.classList.remove('ps-bg-visible');
+            bgFront = 1 - bgFront;
+
+            /* faint colour wash from the art */
+            ambient.style.background =
+                `radial-gradient(120% 90% at 24% 100%, ${g.color}cc 0%, ${g.color}33 42%, transparent 72%)`;
+
+            /* title swap with a quick fade */
+            titleEl.style.opacity = '0';
+            metaEl.style.opacity = '0';
+            setTimeout(() => {
+                titleEl.textContent = g.title;
+                metaEl.textContent = g.meta;
+                titleEl.style.opacity = '1';
+                metaEl.style.opacity = '1';
+            }, 130);
+        }
+
+        function goTo(idx) {
+            idx = Math.max(0, Math.min(GAMES.length - 1, idx));
+            if (idx === activeIdx) return;
+            activeIdx = idx;
+            update();
+        }
+
+        /* ── INPUT (mouse + keyboard) ─────────────────────────── */
+        document.addEventListener('keydown', e => {
+            /* while a title screen is open, Esc closes it and nav is frozen */
+            if (launch.classList.contains('show')) {
+                if (e.key === 'Escape') closeLaunch();
+                return;
+            }
+            if (e.key === 'ArrowRight') { goTo(activeIdx + 1); e.preventDefault(); }
+            else if (e.key === 'ArrowLeft') { goTo(activeIdx - 1); e.preventDefault(); }
+            else if (e.key === 'Enter') { openLaunch(activeIdx); }
+            else if (e.key === 'Escape') { window.location.href = './index.html'; }
+        });
+
+        let wheelLock = false;
+        window.addEventListener('wheel', e => {
+            if (launch.classList.contains('show')) return;
+            if (wheelLock) return;
+            const dir = (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY);
+            if (Math.abs(dir) < 8) return;
+            goTo(activeIdx + (dir > 0 ? 1 : -1));
+            wheelLock = true;
+            setTimeout(() => { wheelLock = false; }, 300);
+        }, { passive: true });
+
+        /* ── CLOCK (12-hour, like the console) ────────────────── */
+        function tick() {
+            const d = new Date();
+            let h = d.getHours();
+            const ap = h >= 12 ? 'PM' : 'AM';
+            h = h % 12 || 12;
+            timeEl.textContent = `${h}:${String(d.getMinutes()).padStart(2, '0')} ${ap}`;
+        }
+        tick();
+        setInterval(tick, 20000);
+
+        /* ── INIT ─────────────────────────────────────────────── */
+        bgImgA.src = GAMES[0].img;
+        bgImgB.src = GAMES[0].img;
+        layerA.classList.add('ps-bg-visible');
         update();
-    }
-
-    /* ── INPUT (mouse + keyboard) ─────────────────────────── */
-    document.addEventListener('keydown', e => {
-        if (e.key === 'ArrowRight') { goTo(activeIdx + 1); e.preventDefault(); }
-        else if (e.key === 'ArrowLeft') { goTo(activeIdx - 1); e.preventDefault(); }
-        else if (e.key === 'Escape') { window.location.href = './index.html'; }
-    });
-
-    let wheelLock = false;
-    window.addEventListener('wheel', e => {
-        if (wheelLock) return;
-        const dir = (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY);
-        if (Math.abs(dir) < 8) return;
-        goTo(activeIdx + (dir > 0 ? 1 : -1));
-        wheelLock = true;
-        setTimeout(() => { wheelLock = false; }, 300);
-    }, { passive: true });
-
-    /* ── CLOCK (12-hour, like the console) ────────────────── */
-    function tick() {
-        const d = new Date();
-        let h = d.getHours();
-        const ap = h >= 12 ? 'PM' : 'AM';
-        h = h % 12 || 12;
-        timeEl.textContent = `${h}:${String(d.getMinutes()).padStart(2, '0')} ${ap}`;
-    }
-    tick();
-    setInterval(tick, 20000);
-
-    /* ── INIT ─────────────────────────────────────────────── */
-    bgImgA.src = GAMES[0].img;
-    bgImgB.src = GAMES[0].img;
-    layerA.classList.add('ps-bg-visible');
-    update();
-</script>
+    </script>
 </body>
+
 </html>
