@@ -519,6 +519,39 @@
             height: 18px;
         }
 
+        /* pop-up box shown when "press any button" is triggered */
+        #ps-launch-box {
+            position: fixed;
+            left: 50%;
+            bottom: 12%;
+            transform: translate(-50%, 20px);
+            z-index: 215;
+            width: min(460px, 86vw);
+            padding: 22px 26px;
+            background: rgba(12, 14, 20, 0.82);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 14px;
+            color: #f3f3f3;
+            font-size: 0.95rem;
+            line-height: 1.55;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        #ps-launch-box.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
+            pointer-events: auto;
+        }
+
+        #ps-launch-box p {
+            margin: 0;
+        }
+
         /* ── RESPONSIVE ─────────────────────────────────────── */
         @media (max-width: 760px) {
             :root {
@@ -606,6 +639,9 @@
             </svg>
         </div>
         <div id="ps-launch-frame"></div>
+        <div id="ps-launch-box">
+            <p>Welcome. This is where the text will go.</p>
+        </div>
     </div>
 
     <!-- Stage -->
@@ -622,7 +658,7 @@
     <script>
         /* ── DATA (games kept as-is) ──────────────────────────── */
         const GAMES = [
-            { title: 'Sekiro: Shadows Die Twice', img: './images/cover-sekiro.png', meta: '112 hours played', color: '#5c0e0e', video: './images/open-sekiro.mp4' },
+            { title: 'Sekiro: Shadows Die Twice', img: './images/cover-sekiro.png', meta: '112 hours played', color: '#5c0e0e', video: './images/open-sekiro.mp4', loopFrom: 9, mute: true },
             { title: 'Pokémon Black 2', img: './images/cover-pokemon.png', meta: 'Too many hours played', color: '#0c1a52', video: './images/open-pokemon.mp4' },
             { title: 'Metal Gear Solid', img: './images/cover-mgs.png', meta: '64 hours played', color: '#162b0e', video: './images/open-mgs.mp4' },
             { title: 'Geometry Dash', img: './images/cover-geometrydash.png', meta: '??? hours played', color: '#0c0625', video: './images/open-geometrydash.mp4' },
@@ -707,22 +743,63 @@
         const launchFrame = document.getElementById('ps-launch-frame');
         const launchLabel = document.getElementById('ps-launch-label');
         const launchClose = document.getElementById('ps-launch-close');
+        const launchBox = document.getElementById('ps-launch-box');
+        let launchPopupEnabled = false;   // true on "press any button" title screens
+
+        function showLaunchBox() {
+            if (!launchPopupEnabled) return;
+            launchBox.classList.add('show');
+        }
 
         function openLaunch(i) {
             const g = GAMES[i];
             if (!g.video) return;
             launchLabel.textContent = g.title;
-            /* locally hosted looping clip — plays inline, no YouTube redirect.
-               built inside the click so the user gesture lets the audio play. */
+            /* locally hosted clip — plays inline, no YouTube redirect.
+               built inside the click so the user gesture lets the audio play.
+
+               games with `loopFrom` play through once, then loop only the tail
+               (e.g. the "press any button" title screen) forever instead of
+               restarting the whole intro. */
+            const loopAttr = g.loopFrom == null ? 'loop' : '';
             launchFrame.innerHTML =
-                `<video src="${g.video}" loop playsinline preload="auto"></video>`;
+                `<video src="${g.video}" ${loopAttr} playsinline preload="auto"></video>`;
             const v = launchFrame.querySelector('video');
+            if (g.mute) v.muted = true;
+            /* the "press any button" box is only available on title screens
+               that have one (currently the looping ones). */
+            launchPopupEnabled = g.loopFrom != null;
+            launchBox.classList.remove('show');
+            /* only a click on the "press any button" text opens the box.
+               the video is object-fit: contain, so map the click into the
+               video's own coordinate space (0..1) and test the text region. */
+            v.addEventListener('click', e => {
+                if (!launchPopupEnabled) return;
+                const rect = v.getBoundingClientRect();
+                const vw = v.videoWidth || 640, vh = v.videoHeight || 360;
+                const scale = Math.min(rect.width / vw, rect.height / vh);
+                const dispW = vw * scale, dispH = vh * scale;
+                const nx = (e.clientX - rect.left - (rect.width - dispW) / 2) / dispW;
+                const ny = (e.clientY - rect.top - (rect.height - dispH) / 2) / dispH;
+                if (nx >= 0.40 && nx <= 0.60 && ny >= 0.71 && ny <= 0.81) showLaunchBox();
+            });
+            if (g.loopFrom != null) {
+                /* once the clip nears its end, jump back to the title screen and
+                   keep replaying just that segment. */
+                v.addEventListener('timeupdate', () => {
+                    if (v.duration && v.currentTime >= v.duration - 0.15) {
+                        v.currentTime = g.loopFrom;
+                        v.play();
+                    }
+                });
+            }
             v.play().catch(() => { v.muted = true; v.play(); });  // fall back to muted if blocked
             launch.classList.add('show');
         }
         function closeLaunch() {
             launch.classList.remove('show');
             launchFrame.innerHTML = '';   // tear down the video so the audio stops
+            launchBox.classList.remove('show');
         }
         launchClose.addEventListener('click', closeLaunch);
         launch.addEventListener('click', e => { if (e.target === launch) closeLaunch(); });
@@ -775,7 +852,8 @@
         document.addEventListener('keydown', e => {
             /* while a title screen is open, Esc closes it and nav is frozen */
             if (launch.classList.contains('show')) {
-                if (e.key === 'Escape') closeLaunch();
+                if (e.key === 'Escape') { closeLaunch(); return; }
+                showLaunchBox();   // any other button opens the box
                 return;
             }
             if (e.key === 'ArrowRight') { goTo(activeIdx + 1); e.preventDefault(); }
