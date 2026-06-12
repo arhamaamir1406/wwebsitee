@@ -460,7 +460,8 @@
             pointer-events: auto;
         }
 
-        /* the draggable game window */
+        /* the draggable game window — styled like a Windows 11 app window:
+           8px rounded corners, hairline border, layered elevation shadow */
         #ps-launch-window {
             position: fixed;
             left: 50%;
@@ -471,11 +472,47 @@
             display: flex;
             flex-direction: column;
             background: #000;
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 40px 120px rgba(0, 0, 0, 0.8);
-            transition: border-radius 0.2s ease;
+            opacity: 0;
+            scale: 0.96;
+            box-shadow:
+                0 32px 64px rgba(0, 0, 0, 0.55),
+                0 8px 20px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(0, 0, 0, 0.45);
+            /* open = Win11 quick fade + scale-in; position is instant on open
+               and only glides once .animated is added (see JS) */
+            transition:
+                opacity 0.18s ease,
+                scale 0.2s cubic-bezier(0.1, 0.9, 0.2, 1),
+                border-radius 0.2s ease,
+                box-shadow 0.22s ease,
+                background 0.22s ease;
+        }
+
+        #ps-launch.show #ps-launch-window {
+            opacity: 1;
+            scale: 1;
+        }
+
+        /* smooth snap/maximize/restore glide, enabled after the window opens */
+        #ps-launch-window.animated {
+            transition:
+                opacity 0.18s ease,
+                scale 0.2s cubic-bezier(0.1, 0.9, 0.2, 1),
+                width 0.24s cubic-bezier(0.2, 0.9, 0.25, 1),
+                height 0.24s cubic-bezier(0.2, 0.9, 0.25, 1),
+                left 0.24s cubic-bezier(0.2, 0.9, 0.25, 1),
+                top 0.24s cubic-bezier(0.2, 0.9, 0.25, 1),
+                border-radius 0.2s ease,
+                box-shadow 0.22s ease,
+                background 0.22s ease;
+        }
+
+        /* never lag the window behind the cursor while dragging the title bar */
+        #ps-launch-window:has(#ps-launch-bar.dragging) {
+            transition: none;
         }
 
         /* maximized — fills the viewport like a real game screen */
@@ -489,32 +526,21 @@
             border-color: transparent;
         }
 
-        /* minimized — collapses to a small bar docked bottom-left */
-        #ps-launch-window.minimized {
-            left: 24px !important;
-            top: auto !important;
-            bottom: 24px;
-            transform: none !important;
-            width: 320px;
-            height: auto;
-            border-radius: 10px;
-        }
-
-        #ps-launch-window.minimized #ps-launch-body {
-            display: none;
-        }
-
-        /* title bar — drag handle + window controls */
+        /* no full title bar — the bar is just an invisible strip across the top
+           that acts as the drag handle and holds the floating caption cluster */
         #ps-launch-bar {
-            flex: 0 0 auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 5;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            height: 46px;
-            padding: 0 10px 0 18px;
-            background: linear-gradient(180deg, rgba(30, 33, 42, 0.97), rgba(16, 18, 24, 0.97));
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            align-items: flex-start;
+            justify-content: flex-end;
+            height: 44px;
+            padding: 8px 8px 0 0;
+            background: transparent;
+            border: none;
             cursor: grab;
             user-select: none;
         }
@@ -527,51 +553,62 @@
             cursor: grabbing;
         }
 
+        /* the game title isn't shown on the window itself */
         #ps-launch-label {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 0.78rem;
-            font-weight: 600;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            display: none;
         }
 
+        /* the three caption buttons live in their own little floating bar */
         #ps-launch-controls {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            align-items: stretch;
             flex: 0 0 auto;
+            height: 32px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(28, 30, 35, 0.66);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(20px) saturate(1.4);
+            -webkit-backdrop-filter: blur(20px) saturate(1.4);
         }
 
+        /* Fluent caption buttons: rectangular, transparent until hover;
+           close goes Win11 crimson */
         .ps-win-btn {
-            width: 30px;
-            height: 30px;
+            width: 42px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 7px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(255, 255, 255, 0.06);
-            color: #fff;
+            border: none;
+            border-radius: 0;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.92);
             cursor: pointer;
-            transition: background 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
+            transition: background 0.12s ease, color 0.12s ease;
         }
 
         .ps-win-btn:hover {
-            background: rgba(255, 255, 255, 0.16);
-            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .ps-win-btn:active {
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .ps-win-btn.close:hover {
-            background: #c0392b;
-            border-color: #c0392b;
+            background: #c42b1c;
+            color: #fff;
+        }
+
+        .ps-win-btn.close:active {
+            background: #b0271a;
         }
 
         .ps-win-btn svg {
-            width: 14px;
-            height: 14px;
+            width: 11px;
+            height: 11px;
+            stroke-width: 1.6;
         }
 
         /* window body — holds the video and the info box */
@@ -947,7 +984,8 @@
         const winMax = document.getElementById('ps-win-max');
         const winClose = document.getElementById('ps-win-close');
         let launchPopupEnabled = false;   // true on "press any button" title screens
-        let restoreState = 'fit';         // where a minimized window returns to
+        let loadedIdx = -1;               // game currently built into the launch frame
+        let parkedIdx = -1;               // game minimized & preserved — resumes on reopen
         let fitAR = null;                 // intrinsic aspect ratio of the current game's video
         let inFit = false;                // window is sized to the video (no black bars)
 
@@ -991,12 +1029,12 @@
             if (!fitAR) return;
             inFit = true;
             launchWindow.classList.remove('maximized', 'minimized');
-            const bar = launchBar.offsetHeight || 46;
-            const maxW = window.innerWidth * 0.94;
-            const maxH = window.innerHeight * 0.94 - bar;
-            const bodyW = Math.min(maxW, maxH * fitAR);
-            const bodyH = bodyW / fitAR;
-            const winW = Math.round(bodyW), winH = Math.round(bodyH + bar);
+            /* the caption cluster floats over the video now, so the whole window
+               is the game — no bar height to subtract. */
+            const maxW = window.innerWidth * 0.92;
+            const maxH = window.innerHeight * 0.92;
+            const winW = Math.round(Math.min(maxW, maxH * fitAR));
+            const winH = Math.round(winW / fitAR);
             launchWindow.style.width = winW + 'px';
             launchWindow.style.height = winH + 'px';
             launchWindow.style.left = Math.max(0, (window.innerWidth - winW) / 2) + 'px';
@@ -1004,50 +1042,37 @@
             launchWindow.style.transform = 'none';
             setVideoPlaying(true);
         }
+        /* minimize = dismiss the window back to the home screen, but KEEP the
+           video paused at its current spot and the window at its current size /
+           position, so reopening the same game resumes exactly where it left off.
+           (closing, by contrast, tears the video down and resets everything.) */
         function minimizeWin() {
-            restoreState = inFit ? 'fit'
-                : launchWindow.classList.contains('maximized') ? 'maximized' : 'windowed';
-            inFit = false;
-            launchWindow.classList.remove('maximized');
-            launchWindow.classList.add('minimized');
-            launchWindow.style.width = '';   // let the .minimized bar size take over
-            launchWindow.style.height = '';
-            setVideoPlaying(false);
-        }
-        function restoreWin() {
-            if (restoreState === 'maximized') maximizeWin();
-            else if (restoreState === 'fit') fitWin(launchFrame.querySelector('video'));
-            else windowWin();
+            if (loadedIdx < 0) return;
+            parkedIdx = loadedIdx;
+            setVideoPlaying(false);                 // pause, preserving currentTime
+            launchBox.classList.remove('show');
+            launchWindow.classList.remove('animated');
+            launch.classList.remove('show');        // overlay gone — back to the tiles
         }
         /* keep a fitted window matched to the viewport as it resizes */
         window.addEventListener('resize', () => { if (inFit) fitWin(); });
 
         winMax.addEventListener('click', () => {
-            if (launchWindow.classList.contains('minimized')) { restoreWin(); return; }
             if (launchWindow.classList.contains('maximized')) windowWin(); else maximizeWin();
         });
-        winMin.addEventListener('click', () => {
-            if (launchWindow.classList.contains('minimized')) restoreWin(); else minimizeWin();
-        });
+        winMin.addEventListener('click', minimizeWin);
 
-        /* double-click the bar toggles maximize <-> windowed */
+        /* double-click the top strip toggles maximize <-> windowed */
         launchBar.addEventListener('dblclick', e => {
             if (e.target.closest('.ps-win-btn')) return;
-            if (launchWindow.classList.contains('minimized')) { restoreWin(); return; }
             if (launchWindow.classList.contains('maximized')) windowWin(); else maximizeWin();
-        });
-        /* click a minimized window to bring it back up */
-        launchBar.addEventListener('click', e => {
-            if (e.target.closest('.ps-win-btn')) return;
-            if (launchWindow.classList.contains('minimized')) restoreWin();
         });
 
         /* drag by the title bar — only while floating (windowed) */
         let dragging = false, dragDX = 0, dragDY = 0;
         launchBar.addEventListener('pointerdown', e => {
             if (e.target.closest('.ps-win-btn')) return;
-            if (launchWindow.classList.contains('maximized') ||
-                launchWindow.classList.contains('minimized')) return;
+            if (launchWindow.classList.contains('maximized')) return;
             dragging = true;
             const rect = launchWindow.getBoundingClientRect();
             dragDX = e.clientX - rect.left;
@@ -1072,6 +1097,19 @@
         function openLaunch(i) {
             const g = GAMES[i];
             if (!g.video) return;
+            /* reopening the game that was minimized? resume it exactly where it
+               was left — same spot in the clip, same window size/position — instead
+               of rebuilding the video from scratch. */
+            if (i === parkedIdx && launchFrame.querySelector('video')) {
+                parkedIdx = -1;
+                launch.classList.add('show');
+                requestAnimationFrame(() => launchWindow.classList.add('animated'));
+                setVideoPlaying(true);
+                return;
+            }
+            /* a fresh game — discard whatever was parked and build from scratch */
+            parkedIdx = -1;
+            loadedIdx = i;
             launchLabel.textContent = g.title;
             /* locally hosted clip — plays inline, no YouTube redirect.
                built inside the click so the user gesture lets the audio play.
@@ -1114,24 +1152,24 @@
             v.play().catch(() => { v.muted = true; v.play(); });  // fall back to muted if blocked
             /* open in a window sized to the game itself — the video fills it
                edge-to-edge with no black bars. the intrinsic size is only known
-               once metadata loads, so fit then (and right away if it's ready). */
-            fitAR = null;
-            if (v.videoWidth && v.videoHeight) {
-                fitWin(v);
-            } else {
-                inFit = true;
-                launchWindow.classList.remove('maximized', 'minimized');   // centred default while it loads
-                launchWindow.style.width = '';
-                launchWindow.style.height = '';
-                launchWindow.style.left = '';
-                launchWindow.style.top = '';
-                launchWindow.style.transform = '';
+               once metadata loads, so size to a 16:9 guess immediately (no layout
+               jump), then glide to the true aspect ratio when metadata arrives. */
+            fitAR = (v.videoWidth && v.videoHeight) ? null : 16 / 9;
+            fitWin(v);
+            if (!(v.videoWidth && v.videoHeight)) {
                 v.addEventListener('loadedmetadata', () => { if (inFit) fitWin(v); }, { once: true });
             }
             launch.classList.add('show');
+            /* enable the snap/maximize glide only after the window has opened,
+               so the opening itself is a clean Win11 fade + scale (no slide). */
+            requestAnimationFrame(() => launchWindow.classList.add('animated'));
         }
         function closeLaunch() {
             launch.classList.remove('show');
+            launchWindow.classList.remove('animated');   // reset for the next clean open
+            inFit = false;
+            parkedIdx = -1;               // full reset — nothing is preserved
+            loadedIdx = -1;
             launchFrame.innerHTML = '';   // tear down the video so the audio stops
             launchBox.classList.remove('show');
         }
