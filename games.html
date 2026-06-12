@@ -947,7 +947,9 @@
         const winMax = document.getElementById('ps-win-max');
         const winClose = document.getElementById('ps-win-close');
         let launchPopupEnabled = false;   // true on "press any button" title screens
-        let restoreState = 'maximized';   // where a minimized window returns to
+        let restoreState = 'fit';         // where a minimized window returns to
+        let fitAR = null;                 // intrinsic aspect ratio of the current game's video
+        let inFit = false;                // window is sized to the video (no black bars)
 
         function showLaunchBox() {
             if (!launchPopupEnabled) return;
@@ -961,30 +963,64 @@
             if (play) v.play().catch(() => {}); else v.pause();
         }
         function maximizeWin() {
+            inFit = false;
             launchWindow.classList.remove('minimized');
             launchWindow.classList.add('maximized');
             launchWindow.style.left = '';
             launchWindow.style.top = '';
+            launchWindow.style.width = '';
+            launchWindow.style.height = '';
             launchWindow.style.transform = '';
             setVideoPlaying(true);
         }
         function windowWin() {
+            inFit = false;
             launchWindow.classList.remove('maximized', 'minimized');
+            launchWindow.style.width = '';
+            launchWindow.style.height = '';
             const w = launchWindow.offsetWidth, h = launchWindow.offsetHeight;
             launchWindow.style.left = Math.max(0, (window.innerWidth - w) / 2) + 'px';
             launchWindow.style.top = Math.max(0, (window.innerHeight - h) / 2) + 'px';
             launchWindow.style.transform = 'none';
             setVideoPlaying(true);
         }
+        /* size the window to the video's own aspect ratio so the game fills it
+           edge-to-edge with no black bars, then centre it in the viewport. */
+        function fitWin(v) {
+            if (v && v.videoWidth && v.videoHeight) fitAR = v.videoWidth / v.videoHeight;
+            if (!fitAR) return;
+            inFit = true;
+            launchWindow.classList.remove('maximized', 'minimized');
+            const bar = launchBar.offsetHeight || 46;
+            const maxW = window.innerWidth * 0.94;
+            const maxH = window.innerHeight * 0.94 - bar;
+            const bodyW = Math.min(maxW, maxH * fitAR);
+            const bodyH = bodyW / fitAR;
+            const winW = Math.round(bodyW), winH = Math.round(bodyH + bar);
+            launchWindow.style.width = winW + 'px';
+            launchWindow.style.height = winH + 'px';
+            launchWindow.style.left = Math.max(0, (window.innerWidth - winW) / 2) + 'px';
+            launchWindow.style.top = Math.max(0, (window.innerHeight - winH) / 2) + 'px';
+            launchWindow.style.transform = 'none';
+            setVideoPlaying(true);
+        }
         function minimizeWin() {
-            restoreState = launchWindow.classList.contains('maximized') ? 'maximized' : 'windowed';
+            restoreState = inFit ? 'fit'
+                : launchWindow.classList.contains('maximized') ? 'maximized' : 'windowed';
+            inFit = false;
             launchWindow.classList.remove('maximized');
             launchWindow.classList.add('minimized');
+            launchWindow.style.width = '';   // let the .minimized bar size take over
+            launchWindow.style.height = '';
             setVideoPlaying(false);
         }
         function restoreWin() {
-            if (restoreState === 'maximized') maximizeWin(); else windowWin();
+            if (restoreState === 'maximized') maximizeWin();
+            else if (restoreState === 'fit') fitWin(launchFrame.querySelector('video'));
+            else windowWin();
         }
+        /* keep a fitted window matched to the viewport as it resizes */
+        window.addEventListener('resize', () => { if (inFit) fitWin(); });
 
         winMax.addEventListener('click', () => {
             if (launchWindow.classList.contains('minimized')) { restoreWin(); return; }
@@ -1076,7 +1112,22 @@
                 });
             }
             v.play().catch(() => { v.muted = true; v.play(); });  // fall back to muted if blocked
-            maximizeWin();   // every game opens full-screen like a console
+            /* open in a window sized to the game itself — the video fills it
+               edge-to-edge with no black bars. the intrinsic size is only known
+               once metadata loads, so fit then (and right away if it's ready). */
+            fitAR = null;
+            if (v.videoWidth && v.videoHeight) {
+                fitWin(v);
+            } else {
+                inFit = true;
+                launchWindow.classList.remove('maximized', 'minimized');   // centred default while it loads
+                launchWindow.style.width = '';
+                launchWindow.style.height = '';
+                launchWindow.style.left = '';
+                launchWindow.style.top = '';
+                launchWindow.style.transform = '';
+                v.addEventListener('loadedmetadata', () => { if (inFit) fitWin(v); }, { once: true });
+            }
             launch.classList.add('show');
         }
         function closeLaunch() {
