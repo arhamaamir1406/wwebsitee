@@ -664,7 +664,8 @@
             transform: translate(-50%, 26px);
             z-index: 215;
             width: min(700px, 92vw);
-            padding: 42px 50px 46px;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
             background:
                 radial-gradient(130% 150% at 50% 0%, rgba(123, 20, 20, 0.22) 0%, transparent 55%),
@@ -686,6 +687,55 @@
             opacity: 1;
             transform: translate(-50%, 0);
             pointer-events: auto;
+        }
+
+        /* the box is its own little window: a caption bar with minimize /
+           maximize / close, then the themed content body below it. */
+        #lb-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex: 0 0 auto;
+            padding: 7px 8px 7px 16px;
+            background: rgba(0, 0, 0, 0.30);
+            border-bottom: 1px solid rgba(155, 28, 28, 0.45);
+        }
+
+        #lb-barlabel {
+            font-size: 0.8rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: rgba(239, 231, 214, 0.82);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #lb-controls {
+            display: flex;
+            flex: 0 0 auto;
+            height: 28px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        #lb-body {
+            position: relative;
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: auto;
+            padding: 34px 50px 44px;
+        }
+
+        /* maximized = fills the whole game window. left/transform stay as the
+           open state (centered) so it grows in place with no slide. */
+        #ps-launch-box.box-max {
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            max-width: none;
+            border-radius: 0;
         }
 
         /* corner ticks — a hint of a traditional frame */
@@ -768,6 +818,80 @@
             color: #cdc3b0;
         }
 
+        /* ── POKÉMON BLACK 2 THEME ──────────────────────────────
+           swaps the Sekiro lacquer for the game's deep-navy / Kyurem
+           palette: midnight-blue glass, electric-blue accents, the
+           official Pokémon yellow title, and a faded Poké Ball seal. */
+        #ps-launch-box.theme-pokemon {
+            background:
+                radial-gradient(130% 150% at 50% 0%, rgba(42, 117, 187, 0.30) 0%, transparent 55%),
+                linear-gradient(180deg, #0a1838 0%, #04081a 100%);
+            border: 1px solid rgba(42, 117, 187, 0.65);
+            border-radius: 10px;
+            color: #d6e2f2;
+            font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+            box-shadow:
+                0 26px 72px rgba(0, 0, 0, 0.78),
+                inset 0 0 0 1px rgba(120, 180, 240, 0.14),
+                inset 0 0 70px rgba(4, 12, 36, 0.6);
+        }
+
+        #ps-launch-box.theme-pokemon::before,
+        #ps-launch-box.theme-pokemon::after {
+            border-color: rgba(120, 180, 240, 0.55);
+        }
+
+        #ps-launch-box.theme-pokemon #lb-bar {
+            background: rgba(4, 12, 36, 0.42);
+            border-bottom: 1px solid rgba(42, 117, 187, 0.5);
+        }
+
+        #ps-launch-box.theme-pokemon #lb-barlabel {
+            color: #ffcb05;
+        }
+
+        /* faded Poké Ball seal — drawn entirely in CSS, no glyph */
+        #ps-launch-box.theme-pokemon .lb-kanji {
+            right: 30px;
+            width: 116px;
+            height: 116px;
+            font-size: 0;
+            border-radius: 50%;
+            border: 4px solid rgba(8, 18, 40, 0.7);
+            background:
+                radial-gradient(circle at 50% 50%, #04081a 0 15px, rgba(120, 180, 240, 0.9) 15px 19px, transparent 19px),
+                linear-gradient(180deg,
+                    rgba(42, 117, 187, 0.85) 0 47%,
+                    rgba(8, 18, 40, 0.95) 47% 53%,
+                    rgba(214, 226, 242, 0.85) 53% 100%);
+            opacity: 0.18;
+        }
+
+        #ps-launch-box.theme-pokemon .lb-title {
+            color: #ffcb05;                                  /* official Pokémon yellow */
+            letter-spacing: 0.12em;
+            text-shadow:
+                0 0 1px #2a75bb,
+                0 2px 14px rgba(42, 117, 187, 0.55);
+        }
+
+        #ps-launch-box.theme-pokemon .lb-divider {
+            background: linear-gradient(90deg,
+                rgba(42, 117, 187, 0) 0%,
+                rgba(120, 180, 240, 0.9) 16%,
+                rgba(120, 180, 240, 0.9) 84%,
+                rgba(42, 117, 187, 0) 100%);
+        }
+
+        #ps-launch-box.theme-pokemon .lb-divider::after {
+            background: #ffcb05;
+            box-shadow: 0 0 9px rgba(255, 203, 5, 0.7);
+        }
+
+        #ps-launch-box.theme-pokemon p {
+            color: #c4d3e8;
+        }
+
         /* ── RESPONSIVE ─────────────────────────────────────── */
         @media (max-width: 760px) {
             :root {
@@ -787,8 +911,8 @@
                 width: auto;
             }
 
-            #ps-launch-box {
-                padding: 30px 28px 32px;
+            #lb-body {
+                padding: 26px 28px 30px;
             }
 
             #ps-launch-box .lb-kanji {
@@ -899,11 +1023,30 @@
             <div class="ps-resize ps-resize-sw" data-dir="sw"></div>
             <div id="ps-launch-body">
                 <div id="ps-launch-frame"></div>
-                <div id="ps-launch-box">
-                    <span class="lb-kanji">隻狼</span>
-                    <h3 class="lb-title">Why I Love This Game</h3>
-                    <div class="lb-divider"></div>
-                    <p>This is the best game of all time. This was my first soulslike and easily has the best mechanics. The parrying is on point and literally every boss is memorable.</p>
+                <div id="ps-launch-box" class="theme-sekiro">
+                    <div id="lb-bar">
+                        <span id="lb-barlabel">Why I Love This Game</span>
+                        <div id="lb-controls">
+                            <button id="lb-max" class="ps-win-btn" type="button" title="Maximize / Restore">
+                                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linejoin="round">
+                                    <rect x="4" y="4" width="12" height="12" rx="1.5" />
+                                </svg>
+                            </button>
+                            <button id="lb-close" class="ps-win-btn close" type="button" title="Close">
+                                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round">
+                                    <path d="M5 5l10 10M15 5L5 15" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="lb-body">
+                        <span class="lb-kanji" id="lb-seal">隻狼</span>
+                        <h3 class="lb-title" id="lb-title">Why I Love This Game</h3>
+                        <div class="lb-divider"></div>
+                        <p id="lb-text">This is the best game of all time. This was my first soulslike and easily has the best mechanics. The parrying is on point and literally every boss is memorable.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -923,8 +1066,26 @@
     <script>
         /* ── DATA (games kept as-is) ──────────────────────────── */
         const GAMES = [
-            { title: 'Sekiro: Shadows Die Twice', img: './images/cover-sekiro.png', meta: '112 hours played', color: '#5c0e0e', video: './images/open-sekiro.mp4', loopFrom: 9, mute: true },
-            { title: 'Pokémon Black 2', img: './images/cover-pokemon.png', meta: 'Too many hours played', color: '#0c1a52', video: './images/open-pokemon.mp4' },
+            {
+                title: 'Sekiro: Shadows Die Twice', img: './images/cover-sekiro.png', meta: '112 hours played', color: '#5c0e0e', video: './images/open-sekiro.mp4', loopFrom: 9, mute: true,
+                popup: {
+                    theme: 'sekiro',
+                    seal: '隻狼',
+                    title: 'Why I Love This Game',
+                    text: 'This is the best game of all time. This was my first soulslike and easily has the best mechanics. The parrying is on point and literally every boss is memorable.',
+                    region: [0.40, 0.60, 0.71, 0.81]   // "press any button" text, in 0..1 video coords
+                }
+            },
+            {
+                title: 'Pokémon Black 2', img: './images/cover-pokemon.png', meta: 'Too many hours played', color: '#0c1a52', video: './images/open-pokemon.mp4',
+                popup: {
+                    theme: 'pokemon',
+                    seal: '',                              // CSS draws a faded Poké Ball seal
+                    title: 'Why I Love This Game',
+                    text: 'This is the best game of all time. This was my first soulslike and easily has the best mechanics. The parrying is on point and literally every boss is memorable.',
+                    region: null                           // no title-text hotspot — any click on the title screen opens it
+                }
+            },
             { title: 'Metal Gear Solid', img: './images/cover-mgs.png', meta: '64 hours played', color: '#162b0e', video: './images/open-mgs.mp4' },
             { title: 'Geometry Dash', img: './images/cover-geometrydash.png', meta: '??? hours played', color: '#0c0625', video: './images/open-geometrydash.mp4' },
         ];
@@ -1013,6 +1174,9 @@
         const winMin = document.getElementById('ps-win-min');
         const winMax = document.getElementById('ps-win-max');
         const winClose = document.getElementById('ps-win-close');
+        const lbBarLabel = document.getElementById('lb-barlabel');
+        const lbMax = document.getElementById('lb-max');
+        const lbClose = document.getElementById('lb-close');
         let launchPopupEnabled = false;   // true on "press any button" title screens
         let loadedIdx = -1;               // game currently built into the launch frame
         let parkedIdx = -1;               // game minimized & preserved — resumes on reopen
@@ -1021,8 +1185,18 @@
 
         function showLaunchBox() {
             if (!launchPopupEnabled) return;
+            launchBox.classList.remove('box-max');   // always reopen in its default size
             launchBox.classList.add('show');
         }
+
+        /* the box is its own little window: maximize fills the game window,
+           close dismisses it. */
+        lbMax.addEventListener('click', () => {
+            launchBox.classList.toggle('box-max');
+        });
+        lbClose.addEventListener('click', () => {
+            launchBox.classList.remove('show', 'box-max');
+        });
 
         /* ── WINDOW CONTROLS (minimize / maximize / restore) ──── */
         function setVideoPlaying(play) {
@@ -1080,7 +1254,7 @@
             if (loadedIdx < 0) return;
             parkedIdx = loadedIdx;
             setVideoPlaying(false);                 // pause, preserving currentTime
-            launchBox.classList.remove('show');
+            launchBox.classList.remove('show', 'box-max');
             launchWindow.classList.remove('animated');
             launch.classList.remove('show');        // overlay gone — back to the tiles
         }
@@ -1199,23 +1373,34 @@
             launchFrame.innerHTML =
                 `<video src="${g.video}" ${loopAttr} playsinline preload="auto"></video>`;
             const v = launchFrame.querySelector('video');
-            if (g.mute) v.muted = true;
-            /* the "press any button" box is only available on title screens
-               that have one (currently the looping ones). */
-            launchPopupEnabled = g.loopFrom != null;
-            launchBox.classList.remove('show');
-            /* only a click on the "press any button" text opens the box.
+            v.muted = true;   // all games play silently — no audio
+            /* the "why I love this game" box is only available on games that
+               define a `popup`; its look + copy are themed per game. */
+            launchPopupEnabled = !!g.popup;
+            launchBox.classList.remove('show', 'box-max', 'theme-sekiro', 'theme-pokemon');
+            if (g.popup) {
+                launchBox.classList.add('theme-' + g.popup.theme);
+                lbBarLabel.textContent = g.title;
+                document.getElementById('lb-seal').textContent = g.popup.seal || '';
+                document.getElementById('lb-title').textContent = g.popup.title;
+                document.getElementById('lb-text').textContent = g.popup.text;
+            }
+            /* a click on the title screen opens the box. with a `region`, only a
+               click inside that hotspot counts (e.g. Sekiro's "press any button"
+               text); with region = null, any click on the screen opens it.
                the video is object-fit: contain, so map the click into the
-               video's own coordinate space (0..1) and test the text region. */
+               video's own coordinate space (0..1) before testing. */
             v.addEventListener('click', e => {
                 if (!launchPopupEnabled) return;
+                const r = g.popup.region;
+                if (!r) { showLaunchBox(); return; }
                 const rect = v.getBoundingClientRect();
                 const vw = v.videoWidth || 640, vh = v.videoHeight || 360;
                 const scale = Math.min(rect.width / vw, rect.height / vh);
                 const dispW = vw * scale, dispH = vh * scale;
                 const nx = (e.clientX - rect.left - (rect.width - dispW) / 2) / dispW;
                 const ny = (e.clientY - rect.top - (rect.height - dispH) / 2) / dispH;
-                if (nx >= 0.40 && nx <= 0.60 && ny >= 0.71 && ny <= 0.81) showLaunchBox();
+                if (nx >= r[0] && nx <= r[1] && ny >= r[2] && ny <= r[3]) showLaunchBox();
             });
             if (g.loopFrom != null) {
                 /* once the clip nears its end, jump back to the title screen and
@@ -1249,7 +1434,7 @@
             parkedIdx = -1;               // full reset — nothing is preserved
             loadedIdx = -1;
             launchFrame.innerHTML = '';   // tear down the video so the audio stops
-            launchBox.classList.remove('show');
+            launchBox.classList.remove('show', 'box-max');
         }
         winClose.addEventListener('click', closeLaunch);
         launch.addEventListener('click', e => { if (e.target === launch) closeLaunch(); });
