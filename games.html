@@ -533,20 +533,76 @@
             z-index: 30;
             touch-action: none;
         }
+
         /* maximized + minimized windows aren't resizable */
         #ps-launch-window.maximized .ps-resize,
         #ps-launch-window.minimized .ps-resize {
             display: none;
         }
 
-        .ps-resize-n { top: -3px; left: 8px; right: 8px; height: 8px; cursor: ns-resize; }
-        .ps-resize-s { bottom: -3px; left: 8px; right: 8px; height: 8px; cursor: ns-resize; }
-        .ps-resize-e { right: -3px; top: 8px; bottom: 8px; width: 8px; cursor: ew-resize; }
-        .ps-resize-w { left: -3px; top: 8px; bottom: 8px; width: 8px; cursor: ew-resize; }
-        .ps-resize-ne { top: -3px; right: -3px; width: 16px; height: 16px; cursor: nesw-resize; }
-        .ps-resize-nw { top: -3px; left: -3px; width: 16px; height: 16px; cursor: nwse-resize; }
-        .ps-resize-se { bottom: -3px; right: -3px; width: 16px; height: 16px; cursor: nwse-resize; }
-        .ps-resize-sw { bottom: -3px; left: -3px; width: 16px; height: 16px; cursor: nesw-resize; }
+        .ps-resize-n {
+            top: -3px;
+            left: 8px;
+            right: 8px;
+            height: 8px;
+            cursor: ns-resize;
+        }
+
+        .ps-resize-s {
+            bottom: -3px;
+            left: 8px;
+            right: 8px;
+            height: 8px;
+            cursor: ns-resize;
+        }
+
+        .ps-resize-e {
+            right: -3px;
+            top: 8px;
+            bottom: 8px;
+            width: 8px;
+            cursor: ew-resize;
+        }
+
+        .ps-resize-w {
+            left: -3px;
+            top: 8px;
+            bottom: 8px;
+            width: 8px;
+            cursor: ew-resize;
+        }
+
+        .ps-resize-ne {
+            top: -3px;
+            right: -3px;
+            width: 16px;
+            height: 16px;
+            cursor: nesw-resize;
+        }
+
+        .ps-resize-nw {
+            top: -3px;
+            left: -3px;
+            width: 16px;
+            height: 16px;
+            cursor: nwse-resize;
+        }
+
+        .ps-resize-se {
+            bottom: -3px;
+            right: -3px;
+            width: 16px;
+            height: 16px;
+            cursor: nwse-resize;
+        }
+
+        .ps-resize-sw {
+            bottom: -3px;
+            left: -3px;
+            width: 16px;
+            height: 16px;
+            cursor: nesw-resize;
+        }
 
         /* no full title bar — the bar is just an invisible strip across the top
            that acts as the drag handle and holds the floating caption cluster */
@@ -791,10 +847,10 @@
             height: 1px;
             margin: 0 0 20px;
             background: linear-gradient(90deg,
-                rgba(155, 28, 28, 0) 0%,
-                rgba(155, 28, 28, 0.85) 16%,
-                rgba(155, 28, 28, 0.85) 84%,
-                rgba(155, 28, 28, 0) 100%);
+                    rgba(155, 28, 28, 0) 0%,
+                    rgba(155, 28, 28, 0.85) 16%,
+                    rgba(155, 28, 28, 0.85) 84%,
+                    rgba(155, 28, 28, 0) 100%);
         }
 
         #ps-launch-box .lb-divider::after {
@@ -868,7 +924,8 @@
         }
 
         #ps-launch-box.theme-pokemon .lb-title {
-            color: #ffcb05;                                  /* official Pokémon yellow */
+            color: #ffcb05;
+            /* official Pokémon yellow */
             letter-spacing: 0.12em;
             text-shadow:
                 0 0 1px #2a75bb,
@@ -877,10 +934,10 @@
 
         #ps-launch-box.theme-pokemon .lb-divider {
             background: linear-gradient(90deg,
-                rgba(42, 117, 187, 0) 0%,
-                rgba(120, 180, 240, 0.9) 16%,
-                rgba(120, 180, 240, 0.9) 84%,
-                rgba(42, 117, 187, 0) 100%);
+                    rgba(42, 117, 187, 0) 0%,
+                    rgba(120, 180, 240, 0.9) 16%,
+                    rgba(120, 180, 240, 0.9) 84%,
+                    rgba(42, 117, 187, 0) 100%);
         }
 
         #ps-launch-box.theme-pokemon .lb-divider::after {
@@ -1045,7 +1102,8 @@
                         <span class="lb-kanji" id="lb-seal">隻狼</span>
                         <h3 class="lb-title" id="lb-title">Why I Love This Game</h3>
                         <div class="lb-divider"></div>
-                        <p id="lb-text">This is the best game of all time. This was my first soulslike and easily has the best mechanics. The parrying is on point and literally every boss is memorable.</p>
+                        <p id="lb-text">This is the best game of all time. This was my first soulslike and easily has
+                            the best mechanics. The parrying is on point and literally every boss is memorable.</p>
                     </div>
                 </div>
             </div>
@@ -1082,7 +1140,7 @@
                     theme: 'pokemon',
                     seal: '',                              // CSS draws a faded Poké Ball seal
                     title: 'Why I Love This Game',
-                    text: 'This is the best game of all time. This was my first soulslike and easily has the best mechanics. The parrying is on point and literally every boss is memorable.',
+                    text: 'I have been playing Pokemon since I was a kid. So imagine my surprise when one of the games started incorporating serious themes and world building. Basically, introduced me to story games and the pixel art is beautiful.',
                     region: null                           // no title-text hotspot — any click on the title screen opens it
                 }
             },
@@ -1202,7 +1260,7 @@
         function setVideoPlaying(play) {
             const v = launchFrame.querySelector('video');
             if (!v) return;
-            if (play) v.play().catch(() => {}); else v.pause();
+            if (play) v.play().catch(() => { }); else v.pause();
         }
         function maximizeWin() {
             inFit = false;
