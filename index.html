@@ -195,7 +195,7 @@
                     <li class="menu-item" data-href="intro.html">Introduction</li>
                     <li class="menu-item" data-href="projects.html">Projects / Things I Do</li>
                     <li class="menu-item" data-href="fitness.html">Fitness</li>
-                    <li class="menu-item" data-href="music.html">Music I Like</li>
+                    <li class="menu-item" data-href="https://music-seven-olive.vercel.app/">Music I Like</li>
                     <li class="menu-item" data-href="games.html">Games I Appreciate</li>
                     <li class="menu-item" data-href="old.html">Old Website</li>
                 </ul>
@@ -328,6 +328,7 @@
                 if (activeIdx === 0) { openIntroWindow(); }
                 else if (activeIdx === items.length - 1) { go(); }
                 else if (items[activeIdx].dataset.href === 'games.html') { go(); }
+                else if (items[activeIdx].dataset.href.startsWith('http')) { go(); }
                 else { openDvd(); }
                 e.preventDefault();
             }
@@ -345,6 +346,7 @@
                 if (i === 0) { openIntroWindow(); }
                 else if (i === items.length - 1) { go(); }
                 else if (items[i].dataset.href === 'games.html') { go(); }
+                else if (items[i].dataset.href.startsWith('http')) { go(); }
                 else { openDvd(); }
             });
         });
